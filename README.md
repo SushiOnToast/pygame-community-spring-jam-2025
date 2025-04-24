@@ -1,1 +1,1 @@
-# pygame-community-spring-jam-2025-
+# Pygame Community Spring Jam 2025
