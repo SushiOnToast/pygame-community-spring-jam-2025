@@ -38,7 +38,9 @@ class Level:
     self.player.echolocation(self.visible_sprites.offset)
     
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
-    self.display_surface.blit(self.cover_surf, (0, 0))
+    
+    if TESTING_OVERLAY:
+      self.display_surface.blit(self.cover_surf, (0, 0))
     
   def run(self):
     self.render()

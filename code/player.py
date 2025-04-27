@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+from support import import_character_sprites
 
 
 class Player(pygame.sprite.Sprite):
@@ -9,7 +10,14 @@ class Player(pygame.sprite.Sprite):
 
     self.cover_surf = cover_surf
 
-    self.image = pygame.image.load("../graphics/test/player.png").convert_alpha()
+    # graphics and animation
+    self.spritesheet = pygame.image.load("../graphics/player/character_spritesheet.png").convert_alpha()
+    self.animations = import_character_sprites(self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
+    self.status = "down_idle"
+    self.frame_index = 0
+    self.animation_speed = 0.15
+
+    self.image = self.animations[self.status][self.frame_index]
     self.rect = self.image.get_rect(topleft=pos)
 
     # movement
@@ -24,24 +32,24 @@ class Player(pygame.sprite.Sprite):
     self.echolocation_time = 0
     self.echolocation_duration = 2000
 
-    # status
-    self.status = "idle"
-    self.orientation = "up"
-
   def input(self):
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_w]:
       self.direction.y = -1
+      self.status = "up"
     elif keys[pygame.K_s]:
       self.direction.y = 1
+      self.status = "down"
     else:
       self.direction.y = 0
 
     if keys[pygame.K_a]:
       self.direction.x = -1
+      self.status = "left"
     elif keys[pygame.K_d]:
       self.direction.x = 1
+      self.status = "right"
     else:
       self.direction.x = 0
 
@@ -89,7 +97,24 @@ class Player(pygame.sprite.Sprite):
             self.echo_radius
         )
 
+  def get_status(self):
+    if self.direction.x == 0 and self.direction.y == 0:
+      if not "_idle" in self.status:
+        self.status = self.status + "_idle"
+
+  def animate(self):
+        animation = self.animations[self.status]
+
+        self.frame_index += self.animation_speed
+        if self.frame_index >= len(animation):
+            self.frame_index = 0
+
+        self.image = animation[int(self.frame_index)]
+        self.rect = self.image.get_rect(center=self.rect.center)
+
   def update(self):
     self.input()
     self.move(self.speed)
     self.cooldowns()
+    self.get_status()
+    self.animate()
