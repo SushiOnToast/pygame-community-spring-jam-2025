@@ -21,8 +21,9 @@ class Player(pygame.sprite.Sprite):
     self.rect = self.image.get_rect(topleft=pos)
 
     # movement
+    self.hitbox = self.rect.copy()
     self.direction = pygame.math.Vector2()
-    self.is_moving = False
+    self.is_moving = False # might be useful for the illumination while walking because of footstep sound
     self.speed = 2
     self.obstacle_sprites = obstacle_sprites
 
@@ -58,27 +59,31 @@ class Player(pygame.sprite.Sprite):
       self.echolocation_time = pygame.time.get_ticks()
 
   def move(self, speed):
-    if self.direction.magnitude() != 0:
-      self.direction = self.direction.normalize()
+        if self.direction.magnitude() != 0:
+            self.direction = self.direction.normalize()
 
-    self.rect.x += self.direction.x * speed
-    self.collision("horizontal")
-    self.rect.y += self.direction.y * speed
-    self.collision("vertical")
+        # Move the hitbox instead of rect
+        self.hitbox.x += self.direction.x * speed
+        self.collision("horizontal")
+        self.hitbox.y += self.direction.y * speed
+        self.collision("vertical")
+        
+        # Update rect to match hitbox position
+        self.rect.center = self.hitbox.center
 
   def collision(self, direction):
-    for sprite in self.obstacle_sprites:
-      if sprite.rect.colliderect(self.rect):
-        if direction == 'horizontal':
-          if self.direction.x > 0:  # moving right
-            self.rect.right = sprite.rect.left
-          if self.direction.x < 0:  # moving left
-            self.rect.left = sprite.rect.right
-        if direction == 'vertical':
-          if self.direction.y > 0:  # moving down
-            self.rect.bottom = sprite.rect.top
-          if self.direction.y < 0:  # moving up
-            self.rect.top = sprite.rect.bottom
+      for sprite in self.obstacle_sprites:
+          if sprite.rect.colliderect(self.hitbox):  # Use hitbox for collision
+              if direction == 'horizontal':
+                  if self.direction.x > 0:  # moving right
+                      self.hitbox.right = sprite.rect.left
+                  if self.direction.x < 0:  # moving left
+                      self.hitbox.left = sprite.rect.right
+              if direction == 'vertical':
+                  if self.direction.y > 0:  # moving down
+                      self.hitbox.bottom = sprite.rect.top
+                  if self.direction.y < 0:  # moving up
+                      self.hitbox.top = sprite.rect.bottom
 
   def cooldowns(self):
     current_time = pygame.time.get_ticks()
@@ -92,8 +97,8 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.circle(
             self.cover_surf, 
             COLORKEY,
-            (self.rect.centerx - camera_offset.x,
-              self.rect.centery - camera_offset.y),
+            (self.hitbox.centerx - camera_offset.x,
+              self.hitbox.centery - camera_offset.y),
             self.echo_radius
         )
 
@@ -110,7 +115,7 @@ class Player(pygame.sprite.Sprite):
             self.frame_index = 0
 
         self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center=self.rect.center)
+        self.rect = self.image.get_rect(center=self.hitbox.center)
 
   def update(self):
     self.input()
