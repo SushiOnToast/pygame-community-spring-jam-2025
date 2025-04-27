@@ -13,6 +13,5 @@ class Tile(pygame.sprite.Sprite):
 
     self.sprite_type = sprite_type
 
-    self.image = surface
-    self.image.fill("white")
+    self.image =  pygame.image.load("../graphics/test/grass.png").convert_alpha()
     self.rect = self.image.get_rect(topleft=pos)

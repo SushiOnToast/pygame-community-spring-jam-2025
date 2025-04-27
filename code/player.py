@@ -6,13 +6,12 @@ class Player(pygame.sprite.Sprite):
   def __init__(self, pos, groups, obstacle_sprites):
     super().__init__(groups)
 
-    self.image = pygame.Surface((24, 32))
-    self.image.fill("red")
+    self.image = pygame.image.load("../graphics/test/player.png").convert_alpha()
     self.rect = self.image.get_rect(topleft=pos)
 
     # movement
     self.direction = pygame.math.Vector2()
-    self.speed = 3
+    self.speed = 2
     self.obstacle_sprites = obstacle_sprites
 
   def input(self):
