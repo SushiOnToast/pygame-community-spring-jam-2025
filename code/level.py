@@ -33,18 +33,26 @@ class Level:
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self, surface):
         super().__init__()
-
         self.display_surface = surface
         self.half_width = self.display_surface.get_size()[0] // 2
         self.half_height = self.display_surface.get_size()[1] // 2
         self.offset = pygame.math.Vector2()
+        
+        # Add these new variables for smooth camera
+        self.camera_target = pygame.math.Vector2()
+        self.camera_speed = 0.1  
 
     def custom_draw(self, player):
-
-        # getting the offset
-        self.offset.x = player.rect.centerx - self.half_width
-        self.offset.y = player.rect.centery - self.half_height
+        # Update camera target position
+        target_x = player.rect.centerx - self.half_width
+        target_y = player.rect.centery - self.half_height
+        self.camera_target = pygame.math.Vector2(target_x, target_y)
         
+        # Smoothly move camera to target (lerp)
+        self.offset.x += (self.camera_target.x - self.offset.x) * self.camera_speed
+        self.offset.y += (self.camera_target.y - self.offset.y) * self.camera_speed
+        
+        # Draw all sprites with smooth offset
         for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
             offset_position = sprite.rect.topleft - self.offset
             self.display_surface.blit(sprite.image, offset_position)
