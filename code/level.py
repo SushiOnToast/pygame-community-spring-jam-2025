@@ -6,8 +6,8 @@ from player import Player
 
 class Level:
 
-  def __init__(self):
-    self.display_surface = pygame.display.get_surface()
+  def __init__(self, surface):
+    self.display_surface = surface
 
     # sprite group setup
     self.visible_sprites = pygame.sprite.Group()
