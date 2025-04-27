@@ -13,6 +13,10 @@ class Level:
     self.visible_sprites = YSortCameraGroup(self.display_surface)
     self.obstacle_sprites = pygame.sprite.Group()
 
+    # overlay mask 
+    self.cover_surf = pygame.Surface((WIDTH, HEIGHT))
+    self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
+
     self.create_map()
 
   def create_map(self):
@@ -23,10 +27,21 @@ class Level:
         if col == 'x':
           Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "test")
         if col == 'p':
-          self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites)
+          self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
 
-  def run(self):
+  def render(self):
     self.visible_sprites.custom_draw(self.player)
+        
+    self.cover_surf.fill('black')
+    self.cover_surf.set_colorkey(COLORKEY)
+    
+    self.player.echolocation(self.visible_sprites.offset)
+    
+    self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
+    self.display_surface.blit(self.cover_surf, (0, 0))
+    
+  def run(self):
+    self.render()
     self.visible_sprites.update()
 
 

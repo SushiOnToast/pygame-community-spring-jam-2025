@@ -1,16 +1,21 @@
 # game setup
+WINDOW_WIDTH = 1280
+WINDOW_HEIGHT = 720
 SCALE_FACTOR = 4
-WIDTH = 1280/SCALE_FACTOR
-HEIGHT = 720/SCALE_FACTOR
+WIDTH = WINDOW_WIDTH/SCALE_FACTOR
+HEIGHT = WINDOW_HEIGHT/SCALE_FACTOR
 FPS = 60
 TILESIZE = 16
 
+OVERLAY_TRANSPARENCY = 250
+
 # colours
 BG_COLOR = "#e8cfa6"
+COLORKEY = "#00ff00"
 
 WORLD_MAP = [
     [
-        'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
+        'x', 'x', 'x', 'x', 'x', 'x', 'x', ' ', 'x', 'x', 'x', 'x', 'x', 'x',
         'x', 'x', 'x', 'x', 'x', 'x'
     ],
     [
