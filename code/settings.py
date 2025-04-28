@@ -14,7 +14,7 @@ BG_COLOR = "#e8cfa6"
 COLORKEY = "#00ff00"
 
 # debug
-TESTING_OVERLAY = False
+TESTING_OVERLAY = True
 
 WORLD_MAP = [
     [

@@ -11,14 +11,14 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Pygame Spring Gamejam")
 
 # Font
-font = pygame.font.Font('graphics/font/Minecraftia-Regular.ttf', 50)
+font = pygame.font.Font('../graphics/font/Minecraftia-Regular.ttf', 50)
 
 # Colors
 TEXT_COL = (255, 255, 255)
 
 # Load button images
-start_img = pygame.image.load("graphics/button/start_btn.png").convert_alpha()
-exit_img = pygame.image.load("graphics/button/exit_btn.png").convert_alpha()
+start_img = pygame.image.load("../graphics/button/start_btn.png").convert_alpha()
+exit_img = pygame.image.load("../graphics/button/exit_btn.png").convert_alpha()
 
 # Create button instances
 start_button = button.Button(456, 210, start_img, 1.3)
