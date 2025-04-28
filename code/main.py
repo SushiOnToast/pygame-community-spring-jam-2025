@@ -2,7 +2,7 @@ import pygame, sys
 from settings import *
 from level import Level
 import button
-
+import player
 pygame.init()
 
 #screen
@@ -51,11 +51,21 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                #testing hp
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.level.player.get_health(200)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:
+                        self.level.player.get_damage(200)
                 
 
             # Draw everything to the display surface first
             self.display_surface.fill(BG_COLOR)
             self.level.run()
+
+            # Draw the health bar (and other UI) here
+            self.level.player.basic_health(self.display_surface)
 
             # Scale the display surface up to the screen
             scaled_surface = pygame.transform.scale_by(self.display_surface, SCALE_FACTOR)

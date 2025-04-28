@@ -3,6 +3,8 @@ from settings import *
 from support import import_character_sprites
 
 
+
+
 class Player(pygame.sprite.Sprite):
 
   def __init__(self, pos, groups, obstacle_sprites, cover_surf):
@@ -32,6 +34,14 @@ class Player(pygame.sprite.Sprite):
     self.is_doing_echolocation = False
     self.echolocation_time = 0
     self.echolocation_duration = 2000
+
+    #hp
+    self.current_health = 1000
+    self.maximum_health = 1000
+    self.health_bar_length = 70 #adjust maximum bar lenght
+    self.health_ratio = self.maximum_health/self.health_bar_length
+        
+
 
   def input(self):
     keys = pygame.key.get_pressed()
@@ -123,3 +133,23 @@ class Player(pygame.sprite.Sprite):
     self.cooldowns()
     self.get_status()
     self.animate()
+    self.basic_health(self.cover_surf)
+
+  def get_damage(self,amount):
+    if self.current_health>0:
+      self.current_health -= 50 #change to amount
+    if self.current_health <= 0:
+       self.current_health = 0
+  
+  def get_health(self,amount):
+    if self.current_health < self.maximum_health:
+       self.current_health += 50 #change to amount later
+    if self.current_health >= self.maximum_health:
+       self.current_health = self.maximum_health
+  
+  def basic_health(self, surface):
+    health_width = (self.current_health / self.maximum_health) * self.health_bar_length
+    health_width = max(0, min(health_width, self.health_bar_length))  # doesn't overflow the max length
+    pygame.draw.rect(surface, (255, 0, 0), (10, 10, self.health_bar_length, 5), 4)
+    pygame.draw.rect(surface, (0, 128, 0), (10, 10, health_width, 5))
+
