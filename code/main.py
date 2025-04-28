@@ -13,11 +13,8 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Pygame Spring Gamejam")
 
 
-
-#game varibales
-game_paused = False
-
 class Game:
+
     def __init__(self):
         pygame.init()
         self.display_surface = pygame.Surface((WIDTH, HEIGHT))
@@ -28,13 +25,19 @@ class Game:
         self.level = Level(self.display_surface)  # Pass display_surface here
 
     def run(self):
+        running = True
 
-        while True:
+        while running:
             for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        running = False
+                        self.playing = False
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-         
+
+            
                 
 
             # Draw everything to the display surface first
