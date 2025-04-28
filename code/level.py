@@ -42,7 +42,7 @@ class Level:
       self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
       
       if TESTING_OVERLAY:
-        self.display_surface.blit(self.cover_surf, (0, 0))
+        self.display_surface.blit(self.cover_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
   def render(self):
     # separate player and background sprites
