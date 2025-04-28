@@ -37,7 +37,7 @@ class Level:
       self.cover_surf.fill('black')
       self.cover_surf.set_colorkey(COLORKEY)
       
-      self.player.echolocation(self.visible_sprites.offset)
+      self.player.echolocation.update(self.player.hitbox, self.visible_sprites.offset)
       
       self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
       

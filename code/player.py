@@ -1,9 +1,7 @@
 import pygame
 from settings import *
 from support import import_character_sprites
-
-
-
+from game_mechanics import *
 
 class Player(pygame.sprite.Sprite):
 
@@ -13,8 +11,10 @@ class Player(pygame.sprite.Sprite):
     self.cover_surf = cover_surf
 
     # graphics and animation
-    self.spritesheet = pygame.image.load("../graphics/player/character_spritesheet.png").convert_alpha()
-    self.animations = import_character_sprites(self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
+    self.spritesheet = pygame.image.load(
+        "../graphics/player/character_spritesheet.png").convert_alpha()
+    self.animations = import_character_sprites(
+        self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
     self.frame_index = 0
     self.animation_speed = 0.15
@@ -25,12 +25,12 @@ class Player(pygame.sprite.Sprite):
     # movement
     self.hitbox = self.rect.copy()
     self.direction = pygame.math.Vector2()
-    self.is_moving = False # might be useful for the illumination while walking because of footstep sound
-    #self.speed = 2
+    # might be useful for the illumination while walking because of footstep sound
+    self.is_moving = False
     self.obstacle_sprites = obstacle_sprites
 
     # echolocation feature
-    self.echo_radius = 50
+    self.echolocation = Echolocation(self.cover_surf, self)
     self.is_doing_echolocation = False
     self.echolocation_time = 0
     self.echolocation_duration = 2000
@@ -43,7 +43,6 @@ class Player(pygame.sprite.Sprite):
     self.speed = self.stats['speed']
 
         
-
 
   def input(self):
     keys = pygame.key.get_pressed()
@@ -71,15 +70,15 @@ class Player(pygame.sprite.Sprite):
       self.echolocation_time = pygame.time.get_ticks()
 
   def move(self, speed):
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
+      if self.direction.magnitude() != 0:
+        self.direction = self.direction.normalize()
 
         # Move the hitbox instead of rect
         self.hitbox.x += self.direction.x * speed
         self.collision("horizontal")
         self.hitbox.y += self.direction.y * speed
         self.collision("vertical")
-        
+
         # Update rect to match hitbox position
         self.rect.center = self.hitbox.center
 
@@ -103,31 +102,20 @@ class Player(pygame.sprite.Sprite):
     if (current_time - self.echolocation_time) >= self.echolocation_duration:
       self.is_doing_echolocation = False
 
-  def echolocation(self, camera_offset):
-    if self.is_doing_echolocation:
-        # Draw circle in screen space (accounting for camera position)
-        pygame.draw.circle(
-            self.cover_surf, 
-            COLORKEY,
-            (self.hitbox.centerx - camera_offset.x,
-              self.hitbox.centery - camera_offset.y),
-            self.echo_radius
-        )
-
   def get_status(self):
     if self.direction.x == 0 and self.direction.y == 0:
+      self.is_moving = False
       if not "_idle" in self.status:
         self.status = self.status + "_idle"
+    else:
+      self.is_moving = True
 
   def animate(self):
-        animation = self.animations[self.status]
+      animation = self.animations[self.status]
 
-        self.frame_index += self.animation_speed
-        if self.frame_index >= len(animation):
-            self.frame_index = 0
-
-        self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center=self.hitbox.center)
+      self.frame_index += self.animation_speed
+      if self.frame_index >= len(animation):
+          self.frame_index = 0
 
   def update(self):
     self.input()
@@ -135,5 +123,3 @@ class Player(pygame.sprite.Sprite):
     self.cooldowns()
     self.get_status()
     self.animate()
-
-
