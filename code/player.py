@@ -25,7 +25,6 @@ class Player(pygame.sprite.Sprite):
     # movement
     self.hitbox = self.rect.copy()
     self.direction = pygame.math.Vector2()
-    # might be useful for the illumination while walking because of footstep sound
     self.is_moving = False
     self.obstacle_sprites = obstacle_sprites
 
@@ -116,6 +115,9 @@ class Player(pygame.sprite.Sprite):
       self.frame_index += self.animation_speed
       if self.frame_index >= len(animation):
           self.frame_index = 0
+
+      self.image = animation[int(self.frame_index)]
+      self.rect = self.image.get_rect(center=self.hitbox.center)
 
   def update(self):
     self.input()
