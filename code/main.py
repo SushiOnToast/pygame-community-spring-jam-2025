@@ -4,6 +4,7 @@ from level import Level
 from button import Button
 import player
 from support import *
+from ui import UI
 pygame.init()
 
 #screen
@@ -11,16 +12,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = WIDTH * SCALE_FACTOR, HEIGHT * SCALE_FACTOR
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Pygame Spring Gamejam")
 
-# Font
-font = pygame.font.Font('../graphics/font/Minecraftia-Regular.ttf', 50)
 
-# Load button images
-start_img = pygame.image.load("../graphics/button/start_btn.png").convert_alpha()
-exit_img = pygame.image.load("../graphics/button/exit_btn.png").convert_alpha()
-
-# Create button instances
-start_button = Button(456, 210, start_img, 1.3)
-exit_button = Button(480, 410, exit_img, 1.3)
 
 #game varibales
 game_paused = False
@@ -30,8 +22,6 @@ class Game:
         pygame.init()
         self.display_surface = pygame.Surface((WIDTH, HEIGHT))
         self.screen = screen
-        #self.screen = pygame.display.set_mode((WIDTH * SCALE_FACTOR, HEIGHT * SCALE_FACTOR))
-        #pygame.display.set_caption('Pygame Spring Gamejam')
         self.clock = pygame.time.Clock()
         self.playing = False
 
@@ -44,43 +34,39 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                #testing hp
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
-                        self.level.player.get_health(200)
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_DOWN:
-                        self.level.player.get_damage(200)
+         
                 
 
             # Draw everything to the display surface first
             self.display_surface.fill(BG_COLOR)
             self.level.run()
 
-            # Draw the health bar (and other UI) here
-            self.level.player.basic_health(self.display_surface)
 
             # Scale the display surface up to the screen
             scaled_surface = pygame.transform.scale_by(self.display_surface, SCALE_FACTOR)
             self.screen.blit(scaled_surface, (0, 0))
+
+            # DRAW UI AFTER SCALING
+            self.level.ui.display(self.level.player)
             
             pygame.display.update()
             self.clock.tick(FPS)
 def main():
     game = Game()
     run = True
+    ui =  UI()
 
     while run:
         screen.fill(BG_COLOR)  # Background color for menu
 
         if not game.playing:
             # Draw menu
-            draw_text(screen, "Echospace", font, TEXT_COLOR, 465, 100)
+            start_clicked, exit_clicked = ui.draw_menu(screen)
 
-            if start_button.update(screen):
+            if start_clicked:
                 game.playing = True
 
-            if exit_button.update(screen):
+            if exit_clicked:
                 run = False
 
         else:
