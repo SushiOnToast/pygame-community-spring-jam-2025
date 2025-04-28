@@ -54,7 +54,6 @@ class Echolocation:
         # Create surface for walking sound
         if self.player.is_moving:
             walk_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-            # Convert COLORKEY to RGBA
             color = (*COLORKEY, self.walking_fade)  # Unpack RGB and add alpha
             pygame.draw.circle(
                 walk_surf,
@@ -67,11 +66,15 @@ class Echolocation:
         # Create surface for echolocation
         if self.player.is_doing_echolocation:
             echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-            for i in range(3):
-                radius = self.echo_current_radius - (i * 10)
+            num_bands = 3
+            band_spacing = 10
+
+            for i in reversed(range(num_bands)):  # <-- Draw outer bands first
+                radius = self.echo_current_radius - (i * band_spacing)
                 if radius > 0:
-                    alpha = max(0, self.echo_fade - (i * 50))
-                    color = (*COLORKEY, alpha)  # Unpack RGB and add alpha
+                    # Outer bands are more transparent
+                    alpha = max(0, self.echo_fade - ((num_bands - 1 - i) * 50))
+                    color = (*COLORKEY, alpha)
                     pygame.draw.circle(
                         echo_surf,
                         color,
@@ -79,6 +82,7 @@ class Echolocation:
                         radius
                     )
             self.cover_surf.blit(echo_surf, (0, 0))
+
     
     def update(self, pos, camera_offset):
         self.update_walking_sound()

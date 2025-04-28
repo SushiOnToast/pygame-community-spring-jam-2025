@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
     self.echolocation = Echolocation(self.cover_surf, self)
     self.is_doing_echolocation = False
     self.echolocation_time = 0
-    self.echolocation_duration = 3000
+    self.echolocation_duration = 2000
 
     #stats
     self.stats = {'health':100,'energy':60,'attack':10,'magic':4,'speed':2}
