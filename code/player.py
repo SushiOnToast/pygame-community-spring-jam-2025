@@ -26,7 +26,7 @@ class Player(pygame.sprite.Sprite):
     self.hitbox = self.rect.copy()
     self.direction = pygame.math.Vector2()
     self.is_moving = False # might be useful for the illumination while walking because of footstep sound
-    self.speed = 2
+    #self.speed = 2
     self.obstacle_sprites = obstacle_sprites
 
     # echolocation feature
@@ -35,11 +35,13 @@ class Player(pygame.sprite.Sprite):
     self.echolocation_time = 0
     self.echolocation_duration = 2000
 
-    #hp
-    self.current_health = 1000
-    self.maximum_health = 1000
-    self.health_bar_length = 70 #adjust maximum bar lenght
-    self.health_ratio = self.maximum_health/self.health_bar_length
+    #stats
+    self.stats = {'health':100,'energy':60,'attack':10,'magic':4,'speed':2}
+    self.health = self.stats['health'] #change health
+    self.energy = self.stats['energy'] #chnage energy
+    self.exp = 123
+    self.speed = self.stats['speed']
+
         
 
 
@@ -133,23 +135,5 @@ class Player(pygame.sprite.Sprite):
     self.cooldowns()
     self.get_status()
     self.animate()
-    self.basic_health(self.cover_surf)
 
-  def get_damage(self,amount):
-    if self.current_health>0:
-      self.current_health -= 50 #change to amount
-    if self.current_health <= 0:
-       self.current_health = 0
-  
-  def get_health(self,amount):
-    if self.current_health < self.maximum_health:
-       self.current_health += 50 #change to amount later
-    if self.current_health >= self.maximum_health:
-       self.current_health = self.maximum_health
-  
-  def basic_health(self, surface):
-    health_width = (self.current_health / self.maximum_health) * self.health_bar_length
-    health_width = max(0, min(health_width, self.health_bar_length))  # doesn't overflow the max length
-    pygame.draw.rect(surface, (255, 0, 0), (10, 10, self.health_bar_length, 5), 4)
-    pygame.draw.rect(surface, (0, 128, 0), (10, 10, health_width, 5))
 

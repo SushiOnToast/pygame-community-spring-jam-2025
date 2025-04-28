@@ -14,8 +14,26 @@ BG_COLOR = "#e8cfa6"
 COLORKEY = "#00ff00"
 TEXT_COLOR = (255, 255, 255)
 
+
 # debug
-TESTING_OVERLAY = True
+TESTING_OVERLAY = False
+
+# ui
+BAR_HEIGHT = 20
+HEALTH_BAR_WIDTH = 200
+ENERGY_BAR_WIDTH = 140
+ITEM_BOX_SIZE = 80
+UI_FONT = 'graphics/font/Minecraftia-Regular.ttf'
+UI_FONT_SIZE = 18
+UI_BG_COLOR = '#222222'
+UI_BORDER_COLOUR = '#111111'
+
+# ui colors
+HEALTH_COLOR = 'red'
+ENERGY_COLOR = 'blue'
+UI_BORDER_COLOUR_ACTIVE = 'gold'
+
+
 
 WORLD_MAP = [
     [

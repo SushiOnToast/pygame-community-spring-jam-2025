@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from tile import Tile
 from player import Player
+from ui import UI
 
 
 class Level:
@@ -18,6 +19,9 @@ class Level:
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
 
     self.create_map()
+
+    # user interface
+    self.ui = UI()
 
   def create_map(self):
     for row_index, row in enumerate(WORLD_MAP):
@@ -49,6 +53,7 @@ class Level:
   def run(self):
     self.render()
     self.visible_sprites.update()
+    self.ui.display(self.player)
 
 
 class YSortCameraGroup(pygame.sprite.Group):
