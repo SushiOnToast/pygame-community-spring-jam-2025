@@ -31,6 +31,7 @@ class Player(pygame.sprite.Sprite):
 
     # echolocation feature
     self.echo_radius = 50
+    self.walking_sound_radius = 0
     self.is_doing_echolocation = False
     self.echolocation_time = 0
     self.echolocation_duration = 2000
@@ -102,7 +103,16 @@ class Player(pygame.sprite.Sprite):
       self.is_doing_echolocation = False
 
   def echolocation(self, camera_offset):
-    if self.is_doing_echolocation:
+    if self.is_moving and not self.is_doing_echolocation:
+       # draw a faint illumination aroudn due to the sound of footsteps
+       pygame.draw.circle(
+            self.cover_surf, 
+            COLORKEY,
+            (self.hitbox.centerx - camera_offset.x,
+              self.hitbox.centery - camera_offset.y),
+            self.walking_sound_radius
+        )
+    elif self.is_doing_echolocation:
         # Draw circle in screen space (accounting for camera position)
         pygame.draw.circle(
             self.cover_surf, 
@@ -114,6 +124,7 @@ class Player(pygame.sprite.Sprite):
 
   def get_status(self):
     if self.direction.x == 0 and self.direction.y == 0:
+      self.is_moving = True
       if not "_idle" in self.status:
         self.status = self.status + "_idle"
 

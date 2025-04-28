@@ -77,10 +77,10 @@ def main():
             # Draw menu
             draw_text(screen, "Echospace", font, TEXT_COLOR, 465, 100)
 
-            if start_button.draw(screen):
+            if start_button.update(screen):
                 game.playing = True
 
-            if exit_button.draw(screen):
+            if exit_button.update(screen):
                 run = False
 
         else:
