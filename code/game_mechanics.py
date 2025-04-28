@@ -15,34 +15,34 @@ class Echolocation:
         self.echo_fade = 255  # Alpha value for echolocation
 
         # walking echo properties
-        self.walking_sound_base_radius = 15
+        self.walking_sound_base_radius = 1
         self.walking_sound_radius = self.walking_sound_base_radius
         self.walking_fade = 255
         self.footstep_interval = 400
         self.footstep_pulse_amount = 5
         self.last_step_time = 0
+        self.walking_ripples = []
 
     def update_walking_sound(self):
         current_time = pygame.time.get_ticks()
 
+        # Spawn new ripple when stepping
         if self.player.is_moving and not self.player.is_doing_echolocation:
-            # Calculate time since last step
-            step_progress = (current_time - self.last_step_time) / \
-                self.footstep_interval
-
-            if step_progress >= 1:
+            if current_time - self.last_step_time >= self.footstep_interval:
                 self.last_step_time = current_time
-                self.walking_sound_radius = self.walking_sound_base_radius
-                self.walking_fade = 255
-            else:
-                # Smooth fade out between steps
-                self.walking_fade = max(0, 255 * (1 - step_progress))
-                # Gradually increase radius
-                self.walking_sound_radius = self.walking_sound_base_radius + \
-                    (self.footstep_pulse_amount * step_progress)
-        else:
-            # Fade out when stopping
-            self.walking_fade = max(0, self.walking_fade - 10)
+                self.walking_ripples.append({
+                    'radius': self.walking_sound_base_radius,
+                    'alpha': 180  # A bit less than full
+                })
+
+        # Update existing ripples
+        for ripple in self.walking_ripples:
+            ripple['radius'] += 0.4  # expand
+            ripple['alpha'] = max(0, ripple['alpha'] - 3)  # fade out slowly
+
+        # Remove fully faded ripples
+        self.walking_ripples = [r for r in self.walking_ripples if r['alpha'] > 0]
+
 
     def update_echolocation(self):
         if self.player.is_doing_echolocation:
@@ -57,17 +57,19 @@ class Echolocation:
             self.echo_fade = 255
 
     def draw(self, pos, camera_offset):
-        # Create surface for walking sound
-        if self.player.is_moving:
+        # Create surface for walking ripples
+        if self.player.is_moving and not self.player.is_doing_echolocation:
             walk_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-            color = (*COLORKEY, self.walking_fade)
-            pygame.draw.circle(
-                walk_surf,
-                color,
-                (pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
-                self.walking_sound_radius
-            )
+            for ripple in self.walking_ripples:
+                color = (*COLORKEY, int(ripple['alpha']))
+                pygame.draw.circle(
+                    walk_surf,
+                    color,
+                    (pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
+                    ripple['radius'],
+                )
             self.cover_surf.blit(walk_surf, (0, 0))
+
 
         # Create surface for echolocation
         if self.player.is_doing_echolocation:
