@@ -12,6 +12,7 @@ OVERLAY_TRANSPARENCY = 250
 # colours
 BG_COLOR = "#e8cfa6"
 COLORKEY = "#00ff00"
+TEXT_COLOR = (255, 255, 255)
 
 # debug
 TESTING_OVERLAY = True

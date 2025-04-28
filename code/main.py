@@ -1,8 +1,9 @@
 import pygame, sys
 from settings import *
 from level import Level
-import button
+from button import Button
 import player
+from support import *
 pygame.init()
 
 #screen
@@ -13,21 +14,13 @@ pygame.display.set_caption("Pygame Spring Gamejam")
 # Font
 font = pygame.font.Font('../graphics/font/Minecraftia-Regular.ttf', 50)
 
-# Colors
-TEXT_COL = (255, 255, 255)
-
 # Load button images
 start_img = pygame.image.load("../graphics/button/start_btn.png").convert_alpha()
 exit_img = pygame.image.load("../graphics/button/exit_btn.png").convert_alpha()
 
 # Create button instances
-start_button = button.Button(456, 210, start_img, 1.3)
-exit_button = button.Button(480, 410, exit_img, 1.3)
-
-# Draw text function
-def draw_text(text, font, text_col, x, y):
-    img = font.render(text, True, text_col)
-    screen.blit(img, (x, y))
+start_button = Button(456, 210, start_img, 1.3)
+exit_button = Button(480, 410, exit_img, 1.3)
 
 #game varibales
 game_paused = False
@@ -82,7 +75,7 @@ def main():
 
         if not game.playing:
             # Draw menu
-            draw_text("Echospace", font, TEXT_COL, 465, 100)
+            draw_text(screen, "Echospace", font, TEXT_COLOR, 465, 100)
 
             if start_button.draw(screen):
                 game.playing = True

@@ -1,6 +1,21 @@
 import pygame
 
+def draw_text(screen, text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
 def import_character_sprites(sheet, frame_width, frame_height):
+    """
+    This function takes in a sprite sheet that has the following configuration:
+    - 4 rows with 4 different directions for sprites, if only one direction is needed, keep only one row
+    - in each row, the first frame is the idle, and the next 3 are the moving animation
+
+    Frame width is the width of the sheet surface divided by the number of sprites in each row, frame height is the height
+    of the sheet surface divided by the number of sprites in each column.
+
+    The function also crops each frame to perfectly fit the actual sprite.
+    """
+
     animations = {
         'down_idle': [], 'down': [],
         'up_idle': [], 'up': [],
