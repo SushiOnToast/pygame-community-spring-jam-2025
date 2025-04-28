@@ -12,7 +12,7 @@ class Player(pygame.sprite.Sprite):
 
     # graphics and animation
     self.spritesheet = pygame.image.load(
-        "../graphics/player/character_spritesheet.png").convert_alpha()
+        "graphics/player/character_spritesheet.png").convert_alpha()
     self.animations = import_character_sprites(
         self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
@@ -41,6 +41,15 @@ class Player(pygame.sprite.Sprite):
     self.exp = 123
     self.speed = self.stats['speed']
 
+    #intergrate with echoloation
+    self.energy_recharge_rate = 0.5
+    self.energy_drain_rate = 0.02     
+    self.max_energy = self.stats['energy']  
+
+    # tracking time
+    self.last_update_time = pygame.time.get_ticks()
+
+
         
 
   def input(self):
@@ -64,9 +73,11 @@ class Player(pygame.sprite.Sprite):
     else:
       self.direction.x = 0
 
-    if keys[pygame.K_SPACE] and not self.is_doing_echolocation:
+    if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 10:
       self.is_doing_echolocation = True
       self.echolocation_time = pygame.time.get_ticks()
+      self.last_update_time = self.echolocation_time
+      self.echolocation_duration = self.energy * 50  # optional, dynamic duration
 
   def move(self, speed):
       if self.direction.magnitude() != 0:
@@ -97,9 +108,28 @@ class Player(pygame.sprite.Sprite):
 
   def cooldowns(self):
     current_time = pygame.time.get_ticks()
+    delta_time = current_time - self.last_update_time
 
-    if (current_time - self.echolocation_time) >= self.echolocation_duration:
-      self.is_doing_echolocation = False
+    if self.is_doing_echolocation:
+        # Drain energy while using echolocation
+        self.energy -= self.energy_drain_rate * delta_time
+        self.energy = max(0, self.energy)
+
+        if self.energy <= 0:
+            self.is_doing_echolocation = False
+        elif (current_time - self.echolocation_time) >= self.echolocation_duration:
+            self.is_doing_echolocation = False
+
+    else:
+        # Regenerate energy when NOT using echolocation
+        if self.energy < self.max_energy:
+            self.energy += self.energy_recharge_rate * delta_time
+            self.energy = min(self.energy, self.max_energy)
+
+    self.last_update_time = current_time
+
+    # if (current_time - self.echolocation_time) >= self.echolocation_duration:
+    #   self.is_doing_echolocation = False
 
   def get_status(self):
     if self.direction.x == 0 and self.direction.y == 0:
