@@ -6,6 +6,7 @@ import player
 from support import *
 from ui import UI
 pygame.init()
+from debug import debug
 
 #screen
 SCREEN_WIDTH, SCREEN_HEIGHT = WIDTH * SCALE_FACTOR, HEIGHT * SCALE_FACTOR
@@ -48,6 +49,8 @@ class Game:
 
             # DRAW UI AFTER SCALING
             self.level.ui.display(self.level.player)
+
+            debug(self.screen, self.clock.get_fps())
             
             pygame.display.update()
             self.clock.tick(FPS)
@@ -77,6 +80,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
+        
         pygame.display.update()
         game.clock.tick(FPS)
 

@@ -34,15 +34,15 @@ class Level:
           self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
 
   def draw_overlay(self):
-      self.cover_surf.fill('black')
-      self.cover_surf.set_colorkey(COLORKEY)
-      
-      self.player.echolocation.update(self.player.hitbox, self.visible_sprites.offset)
-      
-      self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
-      
-      if TESTING_OVERLAY:
-        self.display_surface.blit(self.cover_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+    self.cover_surf.fill('black')
+    self.cover_surf.set_colorkey(COLORKEY)
+    
+    self.player.echolocation.update(self.player.hitbox, self.visible_sprites.offset, self.obstacle_sprites)
+    
+    self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
+    
+    if TESTING_OVERLAY:
+      self.display_surface.blit(self.cover_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
   def render(self):
     # separate player and background sprites

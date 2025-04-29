@@ -14,6 +14,9 @@ BG_COLOR = "#e8cfa6"
 COLORKEY = (254, 254, 254)
 TEXT_COLOR = (255, 255, 255)
 
+# raycasting
+MAX_RAY_DIST = 50
+RAY_STEP = 2
 
 # debug
 TESTING_OVERLAY = True
