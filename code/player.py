@@ -42,7 +42,7 @@ class Player(pygame.sprite.Sprite):
     self.speed = self.stats['speed']
 
     #intergrate with echoloation
-    self.energy_recharge_rate = 0.005
+    self.energy_recharge_rate = 0.001
     self.energy_drain_rate = 0.02     
     self.max_energy = self.stats['energy']  
 
