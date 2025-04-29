@@ -18,7 +18,7 @@ class Echolocation:
         self.walking_sound_base_radius = 1
         self.walking_sound_radius = self.walking_sound_base_radius
         self.walking_fade = 255
-        self.footstep_interval = 400
+        self.footstep_interval = 300
         self.footstep_pulse_amount = 5
         self.last_step_time = 0
         self.walking_ripples = []
@@ -38,6 +38,7 @@ class Echolocation:
         # Update existing ripples
         for ripple in self.walking_ripples:
             ripple['radius'] += 0.4  # expand
+            ripple['radius'] = min(ripple['radius'], 15)
             ripple['alpha'] = max(0, ripple['alpha'] - 3)  # fade out slowly
 
         # Remove fully faded ripples
