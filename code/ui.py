@@ -27,8 +27,8 @@ class UI:
             "../graphics/button/exit_btn.png").convert_alpha()
 
         # Create button instances
-        self.start_button = Button(456, 210, self.start_img, 1.3)
-        self.exit_button = Button(480, 410, self.exit_img, 1.3)
+        self.start_button = Button(WINDOW_WIDTH/2, 275, self.start_img)
+        self.exit_button = Button(WINDOW_WIDTH/2, 410, self.exit_img)
 
     def show_bar(self, current, max_amount, bg_rect, color):
         # draw bg

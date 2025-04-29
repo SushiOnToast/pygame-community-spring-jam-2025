@@ -37,9 +37,6 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            
-                
-
             # Draw everything to the display surface first
             self.display_surface.fill(BG_COLOR)
             self.level.run()
