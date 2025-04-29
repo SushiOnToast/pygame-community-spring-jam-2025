@@ -10,6 +10,11 @@ class Button():
 		self.rect = self.image.get_rect()
 		self.rect.topleft = (x, y)
 		self.clicked = False
+		
+		# hover overlay
+		self.hovering = False
+		self.hover_overlay = pygame.Surface((self.image.get_width(), self.image.get_height()))
+		self.hover_overlay.set_alpha(75)
 
 	def input(self):
 		self.action = False
@@ -18,9 +23,12 @@ class Button():
 
 		#check mouseover and clicked conditions
 		if self.rect.collidepoint(pos):
+			self.hovering = True
 			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
 				self.clicked = True
 				self.action = True
+		else:
+			self.hovering = False
 
 		if pygame.mouse.get_pressed()[0] == 0:
 			self.clicked = False
@@ -28,6 +36,8 @@ class Button():
 	def draw(self, surface):
 		#draw button on screen
 		surface.blit(self.image, (self.rect.x, self.rect.y))
+		if self.hovering:
+			surface.blit(self.hover_overlay, (self.rect.x, self.rect.y))
 
 	def update(self, surface):
 		self.input()
