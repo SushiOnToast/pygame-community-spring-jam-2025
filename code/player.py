@@ -42,7 +42,7 @@ class Player(pygame.sprite.Sprite):
     self.speed = self.stats['speed']
 
     #intergrate with echoloation
-    self.energy_recharge_rate = 0.5
+    self.energy_recharge_rate = 0.001
     self.energy_drain_rate = 0.02     
     self.max_energy = self.stats['energy']  
 
@@ -73,7 +73,7 @@ class Player(pygame.sprite.Sprite):
     else:
       self.direction.x = 0
 
-    if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 10:
+    if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 59:
       self.is_doing_echolocation = True
       self.echolocation_time = pygame.time.get_ticks()
       self.last_update_time = self.echolocation_time
