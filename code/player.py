@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
 
     #intergrate with echoloation
     self.energy_recharge_rate = 0.001
-    self.energy_drain_rate = 0.004     
+    self.energy_drain_rate = 0.007     
     self.max_energy = self.stats['energy']  
 
     # tracking time
