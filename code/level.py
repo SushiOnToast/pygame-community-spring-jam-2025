@@ -70,6 +70,11 @@ class Level:
                 damage = sprite.attack_damage * self.damage_rate * delta_time
                 self.player.health -= damage
                 self.player.health = max(0, self.player.health) 
+            
+            #sound
+            if hasattr(sprite, 'attack_sound'):
+                sprite.attack_sound.play()
+
 
       self.last_damage_time = current_time     
 
