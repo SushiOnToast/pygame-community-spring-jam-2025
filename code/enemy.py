@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from entity import Entity
 from support import import_character_sprites
+import pygame.mixer
 
 class Enemy(Entity):
     def __init__(self, monster_name,pos,groups,obstacle_sprites):
@@ -12,7 +13,6 @@ class Enemy(Entity):
 
         #graphics setup
         #self.import_graphics(monster_name)
-        #to debug setup
         self.spritesheet = pygame.image.load(
         "graphics/player/pixil-frame-0 (9).png").convert_alpha()
         self.animations = import_character_sprites(
@@ -38,6 +38,10 @@ class Enemy(Entity):
         self.attack_type = monster_info['attack_type']
 
         self.direction = pygame.math.Vector2()
+
+        #attack sound
+        self.attack_sound = pygame.mixer.Sound(monster_info['attack_sound'])
+        self.attack_sound.set_volume(0.4)  # adjust volume if needed
 
     def get_player_distance_direction(self,player):
         enemy_vec = pygame.math.Vector2(self.rect.center)
