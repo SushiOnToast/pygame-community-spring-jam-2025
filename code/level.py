@@ -3,7 +3,7 @@ from settings import *
 from tile import Tile
 from player import Player
 from ui import UI
-
+from enemy import Enemy
 
 class Level:
 
@@ -30,8 +30,11 @@ class Level:
         y = row_index * TILESIZE
         if col == 'x':
           Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "test")
-        if col == 'p':
+        if col == 'p' :
           self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
+        elif col == 'e':
+          Enemy('slime', (x, y), [self.visible_sprites],self.obstacle_sprites)
+ 
 
   def draw_overlay(self):
     self.cover_surf.fill('black')
@@ -53,6 +56,7 @@ class Level:
   def run(self):
     self.render()
     self.visible_sprites.update()
+    self.visible_sprites.enemy_update(self.player)
     self.ui.display(self.player)
 
 
@@ -88,3 +92,9 @@ class YSortCameraGroup(pygame.sprite.Group):
       # Draw player after overlay
       offset_position = player.rect.topleft - self.offset
       self.display_surface.blit(player.image, offset_position)
+
+
+    def enemy_update(self,player):
+      enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']
+      for enemy in enemy_sprites:
+        enemy.enemy_update(player) 

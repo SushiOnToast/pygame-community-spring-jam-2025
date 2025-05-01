@@ -2,8 +2,9 @@ import pygame
 from settings import *
 from support import import_character_sprites
 from game_mechanics import *
+from entity import Entity
 
-class Player(pygame.sprite.Sprite):
+class Player(Entity):
 
   def __init__(self, pos, groups, obstacle_sprites, cover_surf):
     super().__init__(groups)
@@ -16,15 +17,13 @@ class Player(pygame.sprite.Sprite):
     self.animations = import_character_sprites(
         self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
-    self.frame_index = 0
-    self.animation_speed = 0.15
+ 
 
     self.image = self.animations[self.status][self.frame_index]
     self.rect = self.image.get_rect(topleft=pos)
 
     # movement
     self.hitbox = self.rect.copy()
-    self.direction = pygame.math.Vector2()
     self.is_moving = False
     self.obstacle_sprites = obstacle_sprites
 
@@ -32,7 +31,7 @@ class Player(pygame.sprite.Sprite):
     self.echolocation = Echolocation(self.cover_surf, self)
     self.is_doing_echolocation = False
     self.echolocation_time = 0
-    self.echolocation_duration = 3000
+    self.echolocation_duration = 4000
 
     #stats
     self.stats = {'health':100,'energy':60,'attack':10,'magic':4,'speed':2}
@@ -52,9 +51,7 @@ class Player(pygame.sprite.Sprite):
     self.echolocation_cooldown_after_zero = 58000
     self.energy_regen_pause_time = 0  # timestamp until which regen is paused
     self.energy_regen_pause_duration = 1000  # 1 second in milliseconds
-
-
-        
+   
 
   def input(self):
     keys = pygame.key.get_pressed()
@@ -94,34 +91,6 @@ class Player(pygame.sprite.Sprite):
         self.last_update_time = current_time
         self.echolocation_duration = self.energy * 50  # optional, dynamic duration
         self.energy_regen_pause_time = current_time + self.energy_regen_pause_duration
-
-
-  def move(self, speed):
-      if self.direction.magnitude() != 0:
-        self.direction = self.direction.normalize()
-
-        # Move the hitbox instead of rect
-        self.hitbox.x += self.direction.x * speed
-        self.collision("horizontal")
-        self.hitbox.y += self.direction.y * speed
-        self.collision("vertical")
-
-        # Update rect to match hitbox position
-        self.rect.center = self.hitbox.center
-
-  def collision(self, direction):
-      for sprite in self.obstacle_sprites:
-          if sprite.rect.colliderect(self.hitbox):  # Use hitbox for collision
-              if direction == 'horizontal':
-                  if self.direction.x > 0:  # moving right
-                      self.hitbox.right = sprite.rect.left
-                  if self.direction.x < 0:  # moving left
-                      self.hitbox.left = sprite.rect.right
-              if direction == 'vertical':
-                  if self.direction.y > 0:  # moving down
-                      self.hitbox.bottom = sprite.rect.top
-                  if self.direction.y < 0:  # moving up
-                      self.hitbox.top = sprite.rect.bottom
 
   def cooldowns(self):
     current_time = pygame.time.get_ticks()
