@@ -50,7 +50,7 @@ class Game:
             # DRAW UI AFTER SCALING
             self.level.ui.display(self.level.player)
 
-            debug(self.screen, self.clock.get_fps())
+            # debug(self.screen, self.clock.get_fps())
             
             pygame.display.update()
             self.clock.tick(FPS)
