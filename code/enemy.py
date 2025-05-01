@@ -41,7 +41,10 @@ class Enemy(Entity):
 
         #attack sound
         self.attack_sound = pygame.mixer.Sound(monster_info['attack_sound'])
-        self.attack_sound.set_volume(0.4)  # adjust volume if needed
+        self.attack_sound.set_volume(0.4)  
+
+        self.last_sound_time = 0  
+        self.sound_cooldown = 1000  
 
     def get_player_distance_direction(self,player):
         enemy_vec = pygame.math.Vector2(self.rect.center)

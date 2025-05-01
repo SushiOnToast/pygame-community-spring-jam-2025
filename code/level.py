@@ -71,9 +71,12 @@ class Level:
                 self.player.health -= damage
                 self.player.health = max(0, self.player.health) 
             
-            #sound
-            if hasattr(sprite, 'attack_sound'):
-                sprite.attack_sound.play()
+           
+                now = pygame.time.get_ticks()
+                if hasattr(sprite, 'attack_sound'):
+                    if now - sprite.last_sound_time > sprite.sound_cooldown:
+                        sprite.attack_sound.play()
+                        sprite.last_sound_time = now
 
 
       self.last_damage_time = current_time     
