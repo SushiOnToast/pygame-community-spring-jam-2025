@@ -23,6 +23,8 @@ class Level:
     # user interface
     self.ui = UI()
 
+    self.last_damage_time = pygame.time.get_ticks()
+
   def create_map(self):
     for row_index, row in enumerate(WORLD_MAP):
       for col_index, col in enumerate(row):
@@ -47,6 +49,31 @@ class Level:
     if TESTING_OVERLAY:
       self.display_surface.blit(self.cover_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
+
+  #collison thing
+  def check_player_enemy_collisions(self):
+    current_time = pygame.time.get_ticks()
+
+    if not hasattr(self, 'last_damage_time'):
+        self.last_damage_time = current_time
+    if not hasattr(self, 'damage_interval'):
+        self.damage_interval = 50  # ms between each damage tick
+    if not hasattr(self, 'damage_rate'):
+        self.damage_rate = 0.005  # damage per ms per attack_damage
+
+    delta_time = current_time - self.last_damage_time
+
+    if delta_time >= self.damage_interval:
+      for sprite in self.visible_sprites:
+        if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy':
+            if self.player.hitbox.colliderect(sprite.hitbox):
+                damage = sprite.attack_damage * self.damage_rate * delta_time
+                self.player.health -= damage
+                self.player.health = max(0, self.player.health) 
+
+      self.last_damage_time = current_time     
+
+
   def render(self):
     # separate player and background sprites
     self.visible_sprites.custom_draw(self.player)      
@@ -57,6 +84,7 @@ class Level:
     self.render()
     self.visible_sprites.update()
     self.visible_sprites.enemy_update(self.player)
+    self.check_player_enemy_collisions()
     self.ui.display(self.player)
 
 
