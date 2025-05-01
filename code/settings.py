@@ -38,7 +38,7 @@ UI_BORDER_COLOUR_ACTIVE = 'gold'
 
 #enemy
 monster_data = {
-    'slime':{'health':100,'exp': 100,'damage':20,'attack_type':'poop','attack_sound':'graphics/audio/fart-with-reverb-39675.mp3','speed':1,'resistance':3,'attack_radius':80,'notice_radius':360}
+    'slime':{'health':100,'exp': 100,'damage':2,'attack_type':'poop','attack_sound':'graphics/audio/fart-with-reverb-39675.mp3','speed':1,'resistance':3,'attack_radius':80,'notice_radius':360}
 }
 
 
