@@ -87,6 +87,14 @@ class Level:
     self.visible_sprites.custom_draw(self.player)      
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
+  
+  def detect_state(self, current_state):
+    state = current_state
+    if current_state == "running":
+      if self.player.health <= 0:
+          state = "dead"
+      
+    return state
     
   def run(self):
     self.render()

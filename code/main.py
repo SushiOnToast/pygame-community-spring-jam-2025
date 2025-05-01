@@ -22,18 +22,19 @@ class Game:
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.playing = False
+        self.state = "start"
 
         self.level = Level(self.display_surface)  # Pass display_surface here
 
     def run(self):
         running = True
+        self.state = "running"
 
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p:
-                        running = False
-                        self.playing = False
+                        self.state = "pause"
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
@@ -41,7 +42,12 @@ class Game:
             # Draw everything to the display surface first
             self.display_surface.fill(BG_COLOR)
             self.level.run()
+            
+            self.state = self.level.detect_state(self.state)
 
+            if self.state != "running":
+                running = False
+                self.playing = False
 
             # Scale the display surface up to the screen
             scaled_surface = pygame.transform.scale_by(self.display_surface, SCALE_FACTOR)
@@ -63,14 +69,19 @@ def main():
         screen.fill(BG_COLOR)  # Background color for menu
 
         if not game.playing:
-            # Draw menu
-            start_clicked, exit_clicked = ui.draw_menu(screen)
+            if game.state == "dead":
+                exit_clicked = ui.draw_death_screen(screen)
+                if exit_clicked:
+                    run = False
+            else:
+                # Draw menu
+                start_clicked, exit_clicked = ui.draw_menu(screen, game.state)
 
-            if start_clicked:
-                game.playing = True
+                if start_clicked:
+                    game.playing = True
 
-            if exit_clicked:
-                run = False
+                if exit_clicked:
+                    run = False
 
         else:
             # Run game
@@ -80,6 +91,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
+        debug(screen, game.state)
         
         pygame.display.update()
         game.clock.tick(FPS)

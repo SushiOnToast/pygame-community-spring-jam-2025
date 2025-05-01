@@ -5,7 +5,7 @@ class Button():
     def __init__(self, x, y, image):
         width = image.get_width()
         height = image.get_height()
-        self.image = image
+        self.image = pygame.transform.scale_by(image, 7)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.clicked = False

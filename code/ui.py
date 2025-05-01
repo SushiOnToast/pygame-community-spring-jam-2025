@@ -25,9 +25,13 @@ class UI:
             "../graphics/button/start_btn.png").convert_alpha()
         self.exit_img = pygame.image.load(
             "../graphics/button/exit_btn.png").convert_alpha()
+        self.unpause_img = pygame.image.load(
+            "../graphics/button/unpause_btn.png"
+        ).convert_alpha()
 
         # Create button instances
-        self.start_button = Button(WINDOW_WIDTH/2, 275, self.start_img)
+        self.start_button = Button(WINDOW_WIDTH/2, 320, self.start_img)
+        self.unpause_button = Button(WINDOW_WIDTH/2, 320, self.unpause_img)
         self.exit_button = Button(WINDOW_WIDTH/2, 410, self.exit_img)
 
     def show_bar(self, current, max_amount, bg_rect, color):
@@ -64,12 +68,22 @@ class UI:
 
         self.show_exp(player.exp)
 
-    def draw_menu(self, screen):
+    def draw_death_screen(self, screen):
+        screen.fill(BG_COLOR)
+        draw_text(screen, "You died!", self.menu_font, TEXT_COLOR, 465, 100)
+        exit_clicked = self.exit_button.update(screen)
+
+        return exit_clicked
+
+    def draw_menu(self, screen, state):
 
         screen.fill(BG_COLOR)  # Background color for menu
         draw_text(screen, "Echospace", self.menu_font, TEXT_COLOR, 465, 100)
+        if state == "start":
+            start_pause_clicked = self.start_button.update(screen)
+        elif state == "pause":
+            start_pause_clicked = self.unpause_button.update(screen)
 
-        start_clicked = self.start_button.update(screen)
         exit_clicked = self.exit_button.update(screen)
 
-        return start_clicked, exit_clicked
+        return start_pause_clicked, exit_clicked
