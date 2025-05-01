@@ -31,7 +31,8 @@ class Player(Entity):
     self.echolocation = Echolocation(self.cover_surf, self)
     self.is_doing_echolocation = False
     self.echolocation_time = 0
-    self.echolocation_duration = 4000
+    self.base_echolocation_duration = 3000  # 4 seconds base duration
+    self.echolocation_duration = self.base_echolocation_duration
 
     #stats
     self.stats = {'health':100,'energy':60,'attack':10,'magic':4,'speed':2}
@@ -43,7 +44,7 @@ class Player(Entity):
 
     #intergrate with echoloation
     self.energy_recharge_rate = 0.001
-    self.energy_drain_rate = 0.007     
+    self.energy_drain_rate = 0.003     
     self.max_energy = self.stats['energy']  
 
     # tracking time
@@ -52,6 +53,8 @@ class Player(Entity):
     self.echolocation_cooldown_after_zero = 58000
     self.energy_regen_pause_time = 0  # timestamp until which regen is paused
     self.energy_regen_pause_duration = 1000  # 1 second in milliseconds
+
+    self.can_do_echolocation = True
    
 
   def input(self):
@@ -75,53 +78,49 @@ class Player(Entity):
     else:
       self.direction.x = 0
 
-    current_time = pygame.time.get_ticks()
-    can_use_echolocation = True
-
-
-    # Check if 1-minute lockout is active
-    if self.zero_energy_time is not None:
-        if (current_time - self.zero_energy_time) < self.echolocation_cooldown_after_zero:
-            can_use_echolocation = False
-        else:
-            self.zero_energy_time = None  # Reset lockout once time has passed
-
-    if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and can_use_echolocation:
+    if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and self.can_do_echolocation:
         self.is_doing_echolocation = True
-        self.echolocation_time = current_time
-        self.last_update_time = current_time
-        self.echolocation_duration = self.energy * 50  # optional, dynamic duration
-        self.energy_regen_pause_time = current_time + self.energy_regen_pause_duration
+        self.echolocation_time = pygame.time.get_ticks()
+        self.last_update_time = pygame.time.get_ticks()
+        # Use fixed duration instead of energy-based
+        self.echolocation_duration = self.base_echolocation_duration
+        self.energy_regen_pause_time = pygame.time.get_ticks() + self.energy_regen_pause_duration
 
   def cooldowns(self):
-    current_time = pygame.time.get_ticks()
-    delta_time = current_time - self.last_update_time
+      current_time = pygame.time.get_ticks()
+      delta_time = current_time - self.last_update_time
 
-    if self.is_doing_echolocation:
-        # Drain energy while using echolocation
-        self.energy -= self.energy_drain_rate * delta_time
-        self.energy = max(0, self.energy)
+      if self.is_doing_echolocation:
+          if not hasattr(self, 'echolocation_time'):  # Safety check
+              self.echolocation_time = current_time
+              
+          # Check duration first
+          if (current_time - self.echolocation_time) >= self.echolocation_duration:
+              self.is_doing_echolocation = False
+              self.energy_regen_pause_time = current_time + self.energy_regen_pause_duration
+          else:
+              # Drain energy while active
+              self.energy -= self.energy_drain_rate * delta_time
+              if self.energy <= 5:
+                  self.energy = 0
+                  self.is_doing_echolocation = False
+                  self.zero_energy_time = current_time
+                  self.can_do_echolocation = False  # Prevent immediate reuse
 
-        if self.energy <= 5:
-            self.energy = 0
-            self.is_doing_echolocation = False
-            if self.zero_energy_time is None:
-               self.zero_energy_time = current_time
-        elif (current_time - self.echolocation_time) >= self.echolocation_duration:
-            self.is_doing_echolocation = False
-
-    else:
-        # Regenerate energy when NOT using echolocation
-        # if self.zero_energy_time is None and current_time >= self.energy_regen_pause_time:
+      else:
+          # Energy regeneration
+          if current_time >= self.energy_regen_pause_time:
               if self.energy < self.max_energy:
-                  if current_time >= self.energy_regen_pause_time:
-                    self.energy += self.energy_recharge_rate * delta_time
-                    self.energy = min(self.energy, self.max_energy)
+                  self.energy += self.energy_recharge_rate * delta_time
+                  self.energy = min(self.energy, self.max_energy)
 
-    self.last_update_time = current_time
+      # Check cooldown after zero energy
+      if self.zero_energy_time is not None:
+          if (current_time - self.zero_energy_time) >= self.echolocation_cooldown_after_zero:
+              self.zero_energy_time = None
+              self.can_do_echolocation = True  # Re-enable echolocation
 
-    # if (current_time - self.echolocation_time) >= self.echolocation_duration:
-    #   self.is_doing_echolocation = False
+      self.last_update_time = current_time
 
   def get_status(self):
     if self.direction.x == 0 and self.direction.y == 0:

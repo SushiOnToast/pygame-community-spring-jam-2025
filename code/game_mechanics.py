@@ -107,7 +107,7 @@ class Echolocation:
             # self.cover_surf.blit(echo_surf, (0, 0))
             echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
             self.echo_fade -= 40
-            color = (*COLORKEY, 180)
+            color = (*COLORKEY, 150)
 
             # Get hit points in world coordinates
             hit_points = get_hit_points(self.player.hitbox.center, 50, list(obstacles), simplify=True)
