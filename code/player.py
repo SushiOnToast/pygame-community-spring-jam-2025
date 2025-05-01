@@ -13,7 +13,7 @@ class Player(Entity):
 
     # graphics and animation
     self.spritesheet = pygame.image.load(
-        "../graphics/player/character_spritesheet.png").convert_alpha()
+        "graphics/player/Untitled_Artwork 4.png").convert_alpha()
     self.animations = import_character_sprites(
         self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
