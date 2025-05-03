@@ -60,66 +60,67 @@ class Echolocation:
             
 
     def draw(self, pos, camera_offset, obstacles):
-        # Create surface for walking ripples
-        if self.player.is_moving and not self.player.is_doing_echolocation:
-            walk_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-            for ripple in self.walking_ripples:
-                color = (*COLORKEY, int(ripple['alpha']))
-                pygame.draw.circle(
-                    walk_surf,
-                    color,
-                    (pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
-                    ripple['radius'],
-                )
-            self.cover_surf.blit(walk_surf, (0, 0))
+        if not self.player.is_crouching:
+            # Create surface for walking ripples
+            if self.player.is_moving and not self.player.is_doing_echolocation:
+                walk_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+                for ripple in self.walking_ripples:
+                    color = (*COLORKEY, int(ripple['alpha']))
+                    pygame.draw.circle(
+                        walk_surf,
+                        color,
+                        (pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
+                        ripple['radius'],
+                    )
+                self.cover_surf.blit(walk_surf, (0, 0))
 
 
-        # Create surface for echolocation
-        if self.player.is_doing_echolocation:
-            # echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-            # num_bands = 3 
-            # band_spacing = 10  
-            # band_thickness = 12  
+            # Create surface for echolocation
+            if self.player.is_doing_echolocation:
+                # echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+                # num_bands = 3 
+                # band_spacing = 10  
+                # band_thickness = 12  
 
-            # for i in reversed(range(num_bands)):
-            #     radius = self.echo_current_radius - (i * band_spacing)
-            #     if radius > 0:
-            #         alpha = max(0, self.echo_fade -
-            #                     ((num_bands - 1 - i) * 40))  
-            #         color = (*COLORKEY, alpha)
-            #         if i == num_bands-1:
-            #             pygame.draw.circle(
-            #                 echo_surf,
-            #                 color,
-            #                 (pos.centerx - camera_offset.x,
-            #                 pos.centery - camera_offset.y),
-            #                 int(radius),
-            #             )
-            #         else:
-            #             pygame.draw.circle(
-            #                 echo_surf,
-            #                 color,
-            #                 (pos.centerx - camera_offset.x,
-            #                 pos.centery - camera_offset.y),
-            #                 int(radius),
-            #                 width=band_thickness  
-            #             )
-            # self.cover_surf.blit(echo_surf, (0, 0))
-            echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-            self.echo_fade -= 40
-            color = (*COLORKEY, 150)
+                # for i in reversed(range(num_bands)):
+                #     radius = self.echo_current_radius - (i * band_spacing)
+                #     if radius > 0:
+                #         alpha = max(0, self.echo_fade -
+                #                     ((num_bands - 1 - i) * 40))  
+                #         color = (*COLORKEY, alpha)
+                #         if i == num_bands-1:
+                #             pygame.draw.circle(
+                #                 echo_surf,
+                #                 color,
+                #                 (pos.centerx - camera_offset.x,
+                #                 pos.centery - camera_offset.y),
+                #                 int(radius),
+                #             )
+                #         else:
+                #             pygame.draw.circle(
+                #                 echo_surf,
+                #                 color,
+                #                 (pos.centerx - camera_offset.x,
+                #                 pos.centery - camera_offset.y),
+                #                 int(radius),
+                #                 width=band_thickness  
+                #             )
+                # self.cover_surf.blit(echo_surf, (0, 0))
+                echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+                self.echo_fade -= 40
+                color = (*COLORKEY, 150)
 
-            # Get hit points in world coordinates
-            hit_points = get_hit_points(self.player.hitbox.center, 50, list(obstacles), simplify=True)
+                # Get hit points in world coordinates
+                hit_points = get_hit_points(self.player.hitbox.center, 50, list(obstacles), simplify=True)
 
-            # Convert hit points to screen coordinates using camera offset
-            screen_points = [pygame.Vector2(point) - camera_offset for point in hit_points]
+                # Convert hit points to screen coordinates using camera offset
+                screen_points = [pygame.Vector2(point) - camera_offset for point in hit_points]
 
-            # Draw polygon if valid
-            if len(screen_points) >= 3:
-                pygame.draw.polygon(echo_surf, color, screen_points)
+                # Draw polygon if valid
+                if len(screen_points) >= 3:
+                    pygame.draw.polygon(echo_surf, color, screen_points)
 
-            self.cover_surf.blit(echo_surf, (0, 0))
+                self.cover_surf.blit(echo_surf, (0, 0))
 
     def update(self, pos, camera_offset, obstacles):
         self.update_walking_sound()

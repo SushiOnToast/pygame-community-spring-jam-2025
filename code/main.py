@@ -54,9 +54,8 @@ class Game:
             self.screen.blit(scaled_surface, (0, 0))
 
             # DRAW UI AFTER SCALING
-            self.level.ui.display(self.level.player)
+            self.level.ui.display(self.level.player, self.level.time_survived)
 
-            # debug(self.screen, self.clock.get_fps())
             
             pygame.display.update()
             self.clock.tick(FPS)
@@ -70,7 +69,7 @@ def main():
 
         if not game.playing:
             if game.state == "dead":
-                exit_clicked = ui.draw_death_screen(screen)
+                exit_clicked = ui.draw_death_screen(screen, game.level.time_survived)
                 if exit_clicked:
                     run = False
             else:
@@ -91,8 +90,6 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-        debug(screen, game.state)
-        
         pygame.display.update()
         game.clock.tick(FPS)
 

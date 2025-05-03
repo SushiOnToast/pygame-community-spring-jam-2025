@@ -33,6 +33,7 @@ class Player(Entity):
     self.echolocation_time = 0
     self.base_echolocation_duration = 3000  # 4 seconds base duration
     self.echolocation_duration = self.base_echolocation_duration
+    self.is_crouching = False
 
     #stats
     self.stats = {'health':100,'energy':60,'attack':10,'magic':4,'speed':2}
@@ -85,6 +86,11 @@ class Player(Entity):
         # Use fixed duration instead of energy-based
         self.echolocation_duration = self.base_echolocation_duration
         self.energy_regen_pause_time = pygame.time.get_ticks() + self.energy_regen_pause_duration
+    
+    if keys[pygame.K_LCTRL]:
+      self.is_crouching = True
+    else:
+      self.is_crouching = False
 
   def cooldowns(self):
       current_time = pygame.time.get_ticks()
@@ -139,6 +145,16 @@ class Player(Entity):
 
       self.image = animation[int(self.frame_index)]
       self.rect = self.image.get_rect(center=self.hitbox.center)
+  
+  def update_speed(self):
+    speed_multiplier = 1
+    animation_speed_multiplier = 1
+    if self.is_crouching:
+      speed_multiplier = 0.5
+      animation_speed_multiplier = 0.5
+    
+    self.speed = self.stats["speed"] * speed_multiplier
+    self.animation_speed = 0.15 * animation_speed_multiplier
 
   def update(self):
     self.input()
@@ -146,3 +162,5 @@ class Player(Entity):
     self.cooldowns()
     self.get_status()
     self.animate()
+    self.update_speed()
+    

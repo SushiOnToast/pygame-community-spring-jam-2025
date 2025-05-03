@@ -9,6 +9,8 @@ class Level:
 
   def __init__(self, surface):
     self.display_surface = surface
+    self.time_survived = 0
+    self.start_time = pygame.time.get_ticks()
 
     # sprite group setup
     self.visible_sprites = YSortCameraGroup(self.display_surface)
@@ -87,6 +89,11 @@ class Level:
     self.visible_sprites.custom_draw(self.player)      
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
+
+  def update_time_survived(self):
+     current_time = pygame.time.get_ticks()
+     self.time_survived = (current_time - self.start_time)/1000
+
   
   def detect_state(self, current_state):
     state = current_state
@@ -101,7 +108,8 @@ class Level:
     self.visible_sprites.update()
     self.visible_sprites.enemy_update(self.player)
     self.check_player_enemy_collisions()
-    self.ui.display(self.player)
+    self.update_time_survived()
+    self.ui.display(self.player, self.time_survived)
 
 
 class YSortCameraGroup(pygame.sprite.Group):
