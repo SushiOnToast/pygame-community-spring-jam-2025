@@ -14,7 +14,7 @@ class Enemy(Entity):
         #graphics setup
         #self.import_graphics(monster_name)
         self.spritesheet = pygame.image.load(
-        "graphics/player/Untitled_Artwork 11.png").convert_alpha()
+        "graphics/player/Untitled_Artwork 12.png").convert_alpha()
         self.animations = import_character_sprites(
             self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
         self.status = "down_idle"
