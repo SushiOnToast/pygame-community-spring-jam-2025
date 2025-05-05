@@ -27,7 +27,7 @@ class Echolocation:
         self.illumination = Illumination()
 
         # audio
-        self.footsteps = pygame.mixer.Sound('graphics/audio/footsteps.wav')
+        self.footsteps = pygame.mixer.Sound('../graphics/audio/footsteps.wav')
         self.footsteps.set_volume(0.4)
         self.footsteps_channel = pygame.mixer.Channel(1)
 
@@ -105,7 +105,7 @@ class Illumination:
     def __init__(self):
 
         self.light_effect = pygame.transform.scale_by(pygame.image.load(
-            "graphics/effects/light_effect.png").convert_alpha(), 0.3)
+            "../graphics/effects/light_effect.png").convert_alpha(), 0.3)
         self.effect_size = self.light_effect.get_size()
         self.pos = None
         self.polygon = []

@@ -35,17 +35,17 @@ class Level:
 
     # death sound
     self.death_sound = pygame.mixer.Sound(
-        'graphics/audio/8-bit-video-game-lose-sound-version-1-145828.mp3')
+        '../graphics/audio/8-bit-video-game-lose-sound-version-1-145828.mp3')
     self.death_sound.set_volume(0.4)
     self.death_channel = pygame.mixer.Channel(1)
 
     # win sound
-    self.win_sound = pygame.mixer.Sound('audio/winsound.mp3')
+    self.win_sound = pygame.mixer.Sound('../audio/winsound.mp3')
     self.win_sound.set_volume(0.4)
     self.win_channel = pygame.mixer.Channel(1)
 
     # core sound
-    self.core_sound = pygame.mixer.Sound('audio/core.mp3')
+    self.core_sound = pygame.mixer.Sound('../audio/core.mp3')
     self.core_sound.set_volume(0.4)
     self.core_channel = pygame.mixer.Channel(1)
 
@@ -60,9 +60,9 @@ class Level:
     self.obstacle_sprites = pygame.sprite.Group()
 
     layouts = {
-        "boundary1": import_csv_layout("map/boundary1.csv"),
-        "boundary2": import_csv_layout("map/boundary2.csv"),
-        "boundary3": import_csv_layout("map/boundary3.csv"),
+        "boundary1": import_csv_layout("../map/boundary1.csv"),
+        "boundary2": import_csv_layout("../map/boundary2.csv"),
+        "boundary3": import_csv_layout("../map/boundary3.csv"),
     }
 
     for row_index, row in enumerate(layouts[f"boundary{self.level_index}"]):
@@ -211,7 +211,7 @@ class YSortCameraGroup(pygame.sprite.Group):
 
         # Pre-load and convert floor surface
         self.floor_surface = pygame.image.load(
-            f"graphics/map/map{level_index}.png").convert()
+            f"../graphics/map/map{level_index}.png").convert()
         self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
 
         # Cache for sprite sorting
