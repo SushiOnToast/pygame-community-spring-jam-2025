@@ -3,6 +3,7 @@ from settings import *
 from support import import_character_sprites
 from game_mechanics import *
 from entity import Entity
+import pygame.mixer
 
 class Player(Entity):
 
@@ -57,6 +58,9 @@ class Player(Entity):
     self.energy_regen_pause_duration = 1000  # 1 second in milliseconds
 
     self.can_do_echolocation = True
+
+   
+
    
 
   def input(self):
@@ -79,6 +83,7 @@ class Player(Entity):
       self.status = "right"
     else:
       self.direction.x = 0
+    
 
     if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and self.can_do_echolocation:
         self.last_echolocation_pos = pygame.Vector2(self.hitbox.centerx, self.hitbox.centery)
@@ -93,6 +98,8 @@ class Player(Entity):
       self.is_crouching = True
     else:
       self.is_crouching = False
+
+
 
   def cooldowns(self):
       current_time = pygame.time.get_ticks()

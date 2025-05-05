@@ -33,6 +33,11 @@ class Level:
     self.last_switch_time = 0
     self.switch_cooldown = 500  # milliseconds
 
+    #death sound
+    self.death_sound = pygame.mixer.Sound('graphics/audio/8-bit-video-game-lose-sound-version-1-145828.mp3')
+    self.death_sound.set_volume(0.4) 
+    self.death_channel = pygame.mixer.Channel(1)  
+
   def create_map(self):
     self.visible_sprites = YSortCameraGroup(self.display_surface, self.level_index)
     self.obstacle_sprites = pygame.sprite.Group()
@@ -152,6 +157,7 @@ class Level:
     if current_state == "running":
       if self.player.health <= 0:
           state = "dead"
+          self.death_channel.play(self.death_sound, loops=-1)
       # if pygame.sprite.collide_rect(self.player, self.resonance):
       #     state = "nextlevel"
       if hasattr(self, 'finalresonance') and pygame.sprite.collide_rect(self.player, self.finalresonance):
