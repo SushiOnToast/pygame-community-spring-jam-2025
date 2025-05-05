@@ -56,18 +56,6 @@ class UI:
         pygame.draw.rect(self.display_surface, color, current_rect)
         pygame.draw.rect(self.display_surface, UI_BORDER_COLOUR, bg_rect, 3)
 
-    def show_exp(self, exp):
-        text_surf = self.font.render(str(int(exp)), False, TEXT_COLOR)
-        x = self.display_surface.get_size()[0] - 20
-        y = self.display_surface.get_size()[1] - 20
-        text_rect = text_surf.get_rect(bottomright=(x, y))
-
-        pygame.draw.rect(self.display_surface, UI_BG_COLOR,
-                         text_rect.inflate(20, 20))
-        self.display_surface.blit(text_surf, text_rect)
-        pygame.draw.rect(self.display_surface, UI_BORDER_COLOUR,
-                         text_rect.inflate(20, 20), 3)
-
     def display(self, player, time_survived):
 
         self.show_bar(
@@ -75,10 +63,8 @@ class UI:
         self.show_bar(
             player.energy, player.stats['energy'], self.energy_bar_rect, ENERGY_COLOR)
 
-        self.show_exp(player.exp)
-
-        draw_text(self.display_surface, str(time_survived),
-                  self.menu_font, TEXT_COLOR, WINDOW_WIDTH-50, 50)
+        draw_text(self.display_surface, str(int(time_survived)),
+                  self.death_font, TEXT_COLOR, WINDOW_WIDTH-40, WINDOW_HEIGHT-50)
 
     def draw_death_screen(self, screen, time_survived):
 
