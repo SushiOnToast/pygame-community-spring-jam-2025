@@ -30,6 +30,9 @@ class UI:
             "../graphics/button/unpause_btn.png"
         ).convert_alpha()
 
+        #win screen
+        self.win_image = pygame.image.load("graphics/WhatsApp Image 2025-05-05 at 23.11.24.jpeg").convert_alpha()
+
         # Create button instances
         self.start_button = Button(WINDOW_WIDTH - 330, 320, self.start_img)
         self.unpause_button = Button(WINDOW_WIDTH - 330, 320, self.unpause_img)
@@ -82,6 +85,13 @@ class UI:
         exit_clicked = self.death_exit_button.update(screen)
 
         return exit_clicked
+    
+    def win_screen(self,screen,state):
+        if state == 'win':
+            rect = self.win_image.get_rect(center=(screen.get_width()//2, screen.get_height()//2))
+            screen.blit(self.win_image, rect)
+
+
 
     def draw_menu(self, screen, state):
 

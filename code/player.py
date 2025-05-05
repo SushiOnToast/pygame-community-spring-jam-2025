@@ -3,6 +3,7 @@ from settings import *
 from support import import_character_sprites
 from game_mechanics import *
 from entity import Entity
+import pygame.mixer
 
 class Player(Entity):
 
@@ -13,7 +14,7 @@ class Player(Entity):
 
     # graphics and animation
     self.spritesheet = pygame.image.load(
-        "../graphics/player/player.png").convert_alpha()
+        "graphics/player/player.png").convert_alpha()
     self.animations = import_character_sprites(
         self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
@@ -57,6 +58,14 @@ class Player(Entity):
     self.energy_regen_pause_duration = 1000  # 1 second in milliseconds
 
     self.can_do_echolocation = True
+
+     #echolocation sound
+    self.echolocation_sound = pygame.mixer.Sound('audio/core.mp3')
+    self.echolocation_sound.set_volume(0.4) 
+    self.echolocation_channel = pygame.mixer.Channel(1) 
+
+   
+
    
 
   def input(self):
@@ -80,6 +89,10 @@ class Player(Entity):
     else:
       self.direction.x = 0
 
+    
+    if keys[pygame.K_SPACE]:
+       self.echolocation_channel.play(self.echolocation_sound)
+
     if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and self.can_do_echolocation:
         self.last_echolocation_pos = pygame.Vector2(self.hitbox.centerx, self.hitbox.centery)
         self.is_doing_echolocation = True
@@ -88,11 +101,14 @@ class Player(Entity):
         # Use fixed duration instead of energy-based
         self.echolocation_duration = self.base_echolocation_duration
         self.energy_regen_pause_time = pygame.time.get_ticks() + self.energy_regen_pause_duration
+        
     
     if keys[pygame.K_LCTRL]:
       self.is_crouching = True
     else:
       self.is_crouching = False
+
+
 
   def cooldowns(self):
       current_time = pygame.time.get_ticks()

@@ -25,18 +25,31 @@ class Echolocation:
         self.walking_ripples = []
 
         self.illumination = Illumination()
+        
+        #audio
+        self.footsteps = pygame.mixer.Sound('graphics/audio/footsteps.wav')
+        self.footsteps.set_volume(0.4) 
+        self.footsteps_channel = pygame.mixer.Channel(1)
+
+        
 
     def update_walking_sound(self):
         current_time = pygame.time.get_ticks()
 
         # Spawn new ripple when stepping
         if self.player.is_moving and not self.player.is_doing_echolocation:
+            if not self.footsteps_channel.get_busy():
+                self.footsteps_channel.play(self.footsteps, loops=-1)
             if current_time - self.last_step_time >= self.footstep_interval:
                 self.last_step_time = current_time
                 self.walking_ripples.append({
                     'radius': self.walking_sound_base_radius,
                     'alpha': 180  
                 })
+        else:
+        # Stop walking sound if not moving or doing echolocation
+            if self.footsteps_channel.get_busy():
+                self.footsteps_channel.stop()
 
         # Update existing ripples
         for ripple in self.walking_ripples:
@@ -93,7 +106,7 @@ class Echolocation:
 class Illumination:
     def __init__(self):
         
-        self.light_effect = pygame.transform.scale_by(pygame.image.load("../graphics/effects/light_effect.png").convert_alpha(), 0.3)
+        self.light_effect = pygame.transform.scale_by(pygame.image.load("graphics/effects/light_effect.png").convert_alpha(), 0.3)
         self.effect_size = self.light_effect.get_size()
         self.pos = None
         self.polygon = []

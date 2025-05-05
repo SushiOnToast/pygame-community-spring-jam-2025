@@ -6,6 +6,8 @@ from ui import UI
 from enemy import *
 from raycasting import *
 from support import *
+from resonasce import Resonance
+from finalcore import FinalResonance
 
 
 class Level:
@@ -31,14 +33,48 @@ class Level:
     self.last_switch_time = 0
     self.switch_cooldown = 500  # milliseconds
 
+    #death sound
+    self.death_sound = pygame.mixer.Sound('graphics/audio/8-bit-video-game-lose-sound-version-1-145828.mp3')
+    self.death_sound.set_volume(0.4) 
+    self.death_channel = pygame.mixer.Channel(1)  
+
+    #win sound
+    self.win_sound = pygame.mixer.Sound('audio/winsound.mp3')
+    self.win_sound.set_volume(0.4) 
+    self.win_channel = pygame.mixer.Channel(1)
+
+    #core sound
+    self.core_sound = pygame.mixer.Sound('audio/core.mp3')
+    self.core_sound.set_volume(0.4) 
+    self.core_channel = pygame.mixer.Channel(1)
+
+    
+
+
+    #overlay images
+    if self.level_index == 1:
+      self.overlay_image = pygame.image.load("graphics/overlays/level1.jpeg").convert_alpha()
+      self.overlay_image_scaled = pygame.transform.scale_by(self.overlay_image,0.3)
+      self.overlay_rect = self.overlay_image_scaled.get_rect(midtop=(0, 0))
+    elif self.level_index == 2:
+      self.overlay_image = pygame.image.load("graphics/overlays/level2.jpeg").convert_alpha()
+      self.overlay_rect = self.overlay_image.get_rect(midtop=(0, 0))
+    elif self.level_index ==3:
+        self.overlay_image = pygame.image.load("graphics/overlays/level3.jpeg").convert_alpha()
+        self.overlay_rect = self.overlay_image.get_rect(midtop=(0, 0))
+    else:
+       self.overlay_image = None
+    
+       
+
   def create_map(self):
     self.visible_sprites = YSortCameraGroup(self.display_surface, self.level_index)
     self.obstacle_sprites = pygame.sprite.Group()
 
     layouts = {
-        "boundary1": import_csv_layout("../map/boundary1.csv"),
-        "boundary2": import_csv_layout("../map/boundary2.csv"),
-        "boundary3": import_csv_layout("../map/boundary3.csv"),
+        "boundary1": import_csv_layout("map/boundary1.csv"),
+        "boundary2": import_csv_layout("map/boundary2.csv"),
+        "boundary3": import_csv_layout("map/boundary3.csv"),
     }
 
     for row_index, row in enumerate(layouts[f"boundary{self.level_index}"]):
@@ -53,17 +89,25 @@ class Level:
                 self.visible_sprites], self.obstacle_sprites)
         if col == '2':
           BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
-        if col != "-1" and col != "295" and col != "1" and col != "2":
+        if col != "-1" and col != "295" and col != "1" and col != "2" and col!= '200' and col!='202':
           Tile((x, y), [self.obstacle_sprites], "invisible")
+        if col == '200':
+           self.resonance = Resonance((x,y),[self.visible_sprites])
+        if col =='202' and self.level_index == 3:
+           self.finalresonance = FinalResonance((x,y),[self.visible_sprites])
 
   def switch_room(self):
     current_time = pygame.time.get_ticks()
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_r] and current_time - self.last_switch_time > self.switch_cooldown:
+    if pygame.sprite.collide_rect(self.player, self.resonance):
+        #add core sound
+        self.core_channel.play(self.core_sound)
         self.level_index = (self.level_index % 3) + 1  # Cycle between 1-3
         self.last_switch_time = current_time
         self.create_map()
+
+    
         
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -134,6 +178,9 @@ class Level:
     if self.player.last_echolocation_pos and SHOW_ECHOLOCATION_POINT:
       pygame.draw.circle(self.display_surface, "red", pygame.Vector2(
           self.player.last_echolocation_pos) - self.visible_sprites.offset, 5)
+      
+    if self.overlay_image and self.overlay_rect:
+      self.display_surface.blit(self.overlay_image, self.overlay_rect)
 
   def update_time_survived(self):
      current_time = pygame.time.get_ticks()
@@ -144,6 +191,15 @@ class Level:
     if current_state == "running":
       if self.player.health <= 0:
           state = "dead"
+          self.death_channel.play(self.death_sound, loops=1)
+      # if pygame.sprite.collide_rect(self.player, self.resonance):
+      #     state = "nextlevel"
+      if hasattr(self, 'finalresonance') and pygame.sprite.collide_rect(self.player, self.finalresonance):
+         state = "win"
+         self.win_channel.play(self.win_sound)
+
+    
+      
 
     return state
 
@@ -168,7 +224,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.camera_speed = 0.1
 
         # Pre-load and convert floor surface
-        self.floor_surface = pygame.image.load(f"../graphics/map/map{level_index}.png").convert()
+        self.floor_surface = pygame.image.load(f"graphics/map/map{level_index}.png").convert()
         self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
         
         # Cache for sprite sorting
