@@ -29,6 +29,7 @@ class Player(Entity):
 
     # echolocation feature
     self.echolocation = Echolocation(self.cover_surf, self)
+    self.last_echolocation_pos = None
     self.is_doing_echolocation = False
     self.echolocation_time = 0
     self.base_echolocation_duration = 3000  # 4 seconds base duration
@@ -80,6 +81,7 @@ class Player(Entity):
       self.direction.x = 0
 
     if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and self.can_do_echolocation:
+        self.last_echolocation_pos = pygame.Vector2(self.hitbox.centerx, self.hitbox.centery)
         self.is_doing_echolocation = True
         self.echolocation_time = pygame.time.get_ticks()
         self.last_update_time = pygame.time.get_ticks()

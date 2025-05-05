@@ -8,7 +8,7 @@ FPS = 60
 TILESIZE = 16
 RAY_TILESIZE = 17
 
-OVERLAY_TRANSPARENCY = 250
+OVERLAY_TRANSPARENCY = 180
 
 # colours
 BG_COLOR = "#15172e"
@@ -21,13 +21,14 @@ RAY_STEP = 2
 
 # debug
 TESTING_OVERLAY = False
+SHOW_ECHOLOCATION_POINT = False
 
 # ui
 BAR_HEIGHT = 20
 HEALTH_BAR_WIDTH = 200
 ENERGY_BAR_WIDTH = 140
 ITEM_BOX_SIZE = 80
-UI_FONT = 'graphics/font/Minecraftia-Regular.ttf'
+UI_FONT = '../graphics/font/Minecraftia-Regular.ttf'
 UI_FONT_SIZE = 18
 UI_BG_COLOR = '#222222'
 UI_BORDER_COLOUR = '#111111'
@@ -39,11 +40,9 @@ UI_BORDER_COLOUR_ACTIVE = 'gold'
 
 #enemy
 monster_data = {
-    'stalker':{'health':100,'exp': 100,'damage':2,'attack_type':'poop','attack_sound':'graphics/audio/fart-with-reverb-39675.mp3','sprite_path': 'graphics/player/Untitled_Artwork 12.png','speed':1,'resistance':3,'attack_radius':80,'notice_radius':360},
-    'blind': {'health':100,'exp': 100,'damage':2,'attack_type':'poop','attack_sound':'graphics/audio/fart-with-reverb-39675.mp3','sprite_path': 'graphics/player/Untitled_Artwork 11.png','speed':1,'resistance':3,'attack_radius':360,'notice_radius':360}
+    'stalker':{'health':100,'exp': 100,'damage':2,'attack_type':'poop','attack_sound':'../graphics/audio/fart-with-reverb-39675.mp3','sprite_path': '../graphics/player/Untitled_Artwork 12.png','speed':1,'resistance':3,'attack_radius':80,'notice_radius':360},
+    'blind': {'health':100,'exp': 100,'damage':2,'attack_type':'poop','attack_sound':'../graphics/audio/fart-with-reverb-39675.mp3','sprite_path': '../graphics/player/Untitled_Artwork 11.png','speed':1,'resistance':3,'attack_radius':360,'notice_radius':360}
 }
-
-
 
 WORLD_MAP = [
     [

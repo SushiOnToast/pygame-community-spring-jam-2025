@@ -3,7 +3,7 @@ from settings import *
 from tile import Tile
 from player import Player
 from ui import UI
-from enemy import Enemy
+from enemy import *
 from raycasting import *
 
 
@@ -43,7 +43,7 @@ class Level:
           Enemy('stalker', (x, y), [
                 self.visible_sprites], self.obstacle_sprites)
         elif col == 'b':
-          Enemy('blind', (x, y), [self.visible_sprites], self.obstacle_sprites)
+          BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
 
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -108,6 +108,8 @@ class Level:
     self.visible_sprites.custom_draw(self.player)
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
+    if self.player.last_echolocation_pos and SHOW_ECHOLOCATION_POINT:
+      pygame.draw.circle(self.display_surface, "red", pygame.Vector2(self.player.last_echolocation_pos) - self.visible_sprites.offset, 5)
 
   def update_time_survived(self):
      current_time = pygame.time.get_ticks()

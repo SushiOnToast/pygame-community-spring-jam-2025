@@ -44,8 +44,6 @@ class Enemy(Entity):
         self.hitbox = self.rect.inflate(0,-10)
         self.obstacle_sprites = obstacle_sprites
 
-
-
         #attack sound
         self.attack_sound = pygame.mixer.Sound(monster_info['attack_sound'])
         self.attack_sound.set_volume(0.4)  
@@ -82,17 +80,6 @@ class Enemy(Entity):
             print('attack')
         elif self.status == 'right' and self.monster_name == 'stalker': #supposed to be left
             self.direction = self.get_player_distance_direction(player)[1]
-        elif self.status == 'right' and self.monster_name == 'blind':
-            self.direction.x = 0
-            self.direction.y = self.vertical_direction
-
-            # Reverse direction at bounds
-            if self.rect.y > self.float_origin + self.max_float_range:
-                self.vertical_direction = -1  # go up
-            elif self.rect.y < self.float_origin - self.max_float_range:
-                self.vertical_direction = 1  # go down
-        else:
-            self.direction = pygame.math.Vector2()
 
     def animate(self):
         animation = self.animations[self.status]
@@ -103,19 +90,88 @@ class Enemy(Entity):
 
         self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center=self.hitbox.center)
-            
-
 
     def update(self):
         self.move(self.speed)
         self.animate()
 
     def enemy_update(self,player):
-        self.get_status(player)
-        self.actions(player)
+        if hasattr(self, 'custom_status'):
+            self.custom_status(player)
+        else:
+            self.get_status(player)
+            
+        if hasattr(self, 'custom_actions'):
+            self.custom_actions(player)
+        else:
+            self.actions(player)
 
       
+class BlindEnemy(Enemy):
+    def __init__(self, pos, groups, obstacle_sprites):
+        super().__init__('blind', pos, groups, obstacle_sprites)
+        # Add properties for echolocation tracking
+        self.target_pos = None
+        self.detection_range = 1000
+        self.memory_duration = 2000
+        self.last_echo_time = 0
+        self.stuck_threshold = 5
+        self.stuck_timer = 0
+        self.stuck_timeout = 1000
+        self.last_position = pygame.math.Vector2(pos)
+        self.move_speed = 2  # Control movement speed
+        self.custom_status = self.get_blind_status
+        self.custom_actions = self.blind_actions
+        self.current_path = None
+        self.last_valid_direction = pygame.math.Vector2()
 
-        
+    def get_blind_status(self, player):
+        # Custom status logic for blind enemy
+        if self.target_pos:
+            self.status = 'right'
+        else:
+            self.status = 'down_idle'
 
+    def blind_actions(self, player):
+        current_time = pygame.time.get_ticks()
+        current_pos = pygame.math.Vector2(self.rect.center)
 
+        # Check for new echolocation - Only update if not already moving or closer to player
+        if player.is_doing_echolocation and player.last_echolocation_pos:
+            echo_pos = pygame.math.Vector2(player.last_echolocation_pos)
+            distance_to_echo = echo_pos.distance_to(current_pos)
+            
+            should_update_target = (
+                distance_to_echo <= self.detection_range and 
+                (self.target_pos is None or 
+                 distance_to_echo < current_pos.distance_to(self.target_pos))
+            )
+            
+            if should_update_target:
+                self.target_pos = echo_pos.copy()
+                self.last_echo_time = current_time
+                self.stuck_timer = 0  # Reset stuck timer for new target
+
+        # Movement behavior
+        if self.target_pos and current_time - self.last_echo_time < self.memory_duration:
+            target_vec = pygame.math.Vector2(self.target_pos)
+            distance_to_target = current_pos.distance_to(target_vec)
+            
+            if distance_to_target > self.stuck_threshold:
+                # Calculate direction vector
+                direction = (target_vec - current_pos)
+                if direction.length() > 0:
+                    self.last_valid_direction = direction.normalize()
+                    self.direction = self.last_valid_direction
+            else:
+                self.target_pos = None
+                self.direction = pygame.math.Vector2()
+        else:
+            # Default floating behavior
+            self.direction.x = 0
+            self.direction.y = self.vertical_direction
+
+            if self.rect.y > self.float_origin + self.max_float_range:
+                self.vertical_direction = -1
+            elif self.rect.y < self.float_origin - self.max_float_range:
+                self.vertical_direction = 1
