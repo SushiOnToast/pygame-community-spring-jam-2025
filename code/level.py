@@ -6,6 +6,7 @@ from ui import UI
 from enemy import *
 from raycasting import *
 from support import *
+from ressonace import Resonance
 
 
 class Level:
@@ -51,8 +52,11 @@ class Level:
                 self.visible_sprites], self.obstacle_sprites)
         if col == '2':
           BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
-        if col != "-1" and col != "295" and col != "1" and col != "2":
+        if col != "-1" and col != "295" and col != "1" and col != "2" and col!=200:
           Tile((x, y), [self.obstacle_sprites], "invisible")
+        if col == '200':
+          Resonance((x, y), [self.visible_sprites])
+  
         
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -156,7 +160,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.camera_speed = 0.1
 
         # Pre-load and convert floor surface
-        self.floor_surface = pygame.image.load(f"../graphics/map/map{level_index}.png").convert()
+        self.floor_surface = pygame.image.load(f"graphics/map/map{level_index}.png").convert()
         self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
         
         # Cache for sprite sorting
