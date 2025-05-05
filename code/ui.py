@@ -10,7 +10,7 @@ class UI:
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.Font(UI_FONT, UI_FONT_SIZE)
         self.death_font = pygame.font.Font(UI_FONT, 25)
-        
+
         # bar setup
         self.health_bar_rect = pygame.Rect(
             10, 10, HEALTH_BAR_WIDTH, BAR_HEIGHT)
@@ -30,13 +30,16 @@ class UI:
             "../graphics/button/unpause_btn.png"
         ).convert_alpha()
 
-        #win screen
-        self.win_image = pygame.image.load("graphics/WhatsApp Image 2025-05-05 at 23.11.24.jpeg").convert_alpha()
+        # win screen
+        self.win_image = pygame.image.load(
+            "../graphics/WhatsApp Image 2025-05-05 at 23.11.24.jpeg").convert_alpha()
 
         # Create button instances
         self.start_button = Button(WINDOW_WIDTH - 330, 320, self.start_img)
         self.unpause_button = Button(WINDOW_WIDTH - 330, 320, self.unpause_img)
-        self.death_exit_button = Button(WINDOW_WIDTH - 150, 50, self.exit_img, 5)  # New death screen exit button  
+        # New death screen exit button
+        self.death_exit_button = Button(
+            WINDOW_WIDTH - 150, 50, self.exit_img, 5)
         self.exit_button = Button(WINDOW_WIDTH - 330, 410, self.exit_img)
 
     def show_bar(self, current, max_amount, bg_rect, color):
@@ -74,28 +77,35 @@ class UI:
 
         self.show_exp(player.exp)
 
-        draw_text(self.display_surface, str(time_survived), self.menu_font, TEXT_COLOR, WINDOW_WIDTH-50, 50)
+        draw_text(self.display_surface, str(time_survived),
+                  self.menu_font, TEXT_COLOR, WINDOW_WIDTH-50, 50)
 
     def draw_death_screen(self, screen, time_survived):
 
-        death_img = pygame.transform.scale_by(pygame.image.load(f"../graphics/menus/death.png").convert(), 0.84)
+        death_img = pygame.transform.scale_by(pygame.image.load(
+            f"../graphics/menus/death.png").convert(), 0.84)
         screen.fill(MENU_BG_COLOR)
         screen.blit(death_img)
-        draw_text(screen, f"{str(int(time_survived))} seconds survived", self.death_font, TEXT_COLOR, WINDOW_WIDTH//2-140, WINDOW_HEIGHT-70)
+        draw_text(screen, f"{str(int(time_survived))} seconds survived",
+                  self.death_font, TEXT_COLOR, WINDOW_WIDTH//2-140, WINDOW_HEIGHT-70)
         exit_clicked = self.death_exit_button.update(screen)
 
         return exit_clicked
-    
-    def win_screen(self,screen,state):
-        if state == 'win':
-            rect = self.win_image.get_rect(center=(screen.get_width()//2, screen.get_height()//2))
-            screen.blit(self.win_image, rect)
 
+    def win_screen(self, screen, time_survived):
+        rect = self.win_image.get_rect(
+            center=(screen.get_width()//2, screen.get_height()//2))
+        screen.blit(self.win_image, rect)
+        draw_text(screen, f"{str(int(time_survived))} seconds survived",
+                  self.death_font, TEXT_COLOR, WINDOW_WIDTH//2-140, WINDOW_HEIGHT-70)
+        exit_clicked = self.death_exit_button.update(screen)
 
+        return exit_clicked
 
     def draw_menu(self, screen, state):
 
-        menu_img = pygame.transform.scale_by(pygame.image.load(f"../graphics/menus/{state}_menu.png").convert(), 0.75)
+        menu_img = pygame.transform.scale_by(pygame.image.load(
+            f"../graphics/menus/{state}_menu.png").convert(), 0.75)
 
         screen.fill(MENU_BG_COLOR)  # Background color for menu
         screen.blit(menu_img)

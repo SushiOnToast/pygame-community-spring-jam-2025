@@ -1,4 +1,6 @@
-import pygame, sys
+from debug import debug
+import pygame
+import sys
 from settings import *
 from level import Level
 from button import Button
@@ -6,9 +8,8 @@ import player
 from support import *
 from ui import UI
 pygame.init()
-from debug import debug
 
-#screen
+# screen
 SCREEN_WIDTH, SCREEN_HEIGHT = WIDTH * SCALE_FACTOR, HEIGHT * SCALE_FACTOR
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Pygame Spring Gamejam")
@@ -42,7 +43,7 @@ class Game:
             # Draw everything to the display surface first
             self.display_surface.fill(BG_COLOR)
             self.level.run()
-            
+
             self.state = self.level.detect_state(self.state)
 
             if self.state != "running":
@@ -50,32 +51,34 @@ class Game:
                 self.playing = False
 
             # Scale the display surface up to the screen
-            scaled_surface = pygame.transform.scale_by(self.display_surface, SCALE_FACTOR)
+            scaled_surface = pygame.transform.scale_by(
+                self.display_surface, SCALE_FACTOR)
             self.screen.blit(scaled_surface, (0, 0))
 
             # DRAW UI AFTER SCALING
             self.level.ui.display(self.level.player, self.level.time_survived)
 
-            
             pygame.display.update()
             self.clock.tick(FPS)
+
+
 def main():
     game = Game()
     run = True
-    ui =  UI()
+    ui = UI()
 
     while run:
         screen.fill(BG_COLOR)  # Background color for menu
 
         if not game.playing:
             if game.state == "dead":
-                exit_clicked = ui.draw_death_screen(screen, game.level.time_survived)
+                exit_clicked = ui.draw_death_screen(
+                    screen, game.level.time_survived)
                 if exit_clicked:
                     run = False
-            if game.state == 'win':
-                ui.win_screen(screen,game.state)
+            elif game.state == 'win':
+                ui.win_screen(screen, game.level.time_survived)
                 pygame.display.update()
-
             else:
                 # Draw menu
                 start_clicked, exit_clicked = ui.draw_menu(screen, game.state)

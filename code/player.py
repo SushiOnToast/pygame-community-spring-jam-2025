@@ -5,6 +5,7 @@ from game_mechanics import *
 from entity import Entity
 import pygame.mixer
 
+
 class Player(Entity):
 
   def __init__(self, pos, groups, obstacle_sprites, cover_surf):
@@ -14,11 +15,10 @@ class Player(Entity):
 
     # graphics and animation
     self.spritesheet = pygame.image.load(
-        "graphics/player/player.png").convert_alpha()
+        "../graphics/player/player.png").convert_alpha()
     self.animations = import_character_sprites(
         self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
- 
 
     self.image = self.animations[self.status][self.frame_index]
     self.rect = self.image.get_rect(topleft=pos)
@@ -37,18 +37,19 @@ class Player(Entity):
     self.echolocation_duration = self.base_echolocation_duration
     self.is_crouching = False
 
-    #stats
-    self.stats = {'health':100,'energy':60,'attack':10,'magic':4,'speed':2}
-    self.health = self.stats['health'] #change health
+    # stats
+    self.stats = {'health': 100, 'energy': 60,
+                  'attack': 10, 'magic': 4, 'speed': 2}
+    self.health = self.stats['health']  # change health
     self.health = max(0, self.health)
-    self.energy = self.stats['energy'] #chnage energy
+    self.energy = self.stats['energy']  # chnage energy
     self.exp = 123
     self.speed = self.stats['speed']
 
-    #intergrate with echoloation
+    # intergrate with echoloation
     self.energy_recharge_rate = 0.001
-    self.energy_drain_rate = 0.003     
-    self.max_energy = self.stats['energy']  
+    self.energy_drain_rate = 0.003
+    self.max_energy = self.stats['energy']
 
     # tracking time
     self.last_update_time = pygame.time.get_ticks()
@@ -59,14 +60,10 @@ class Player(Entity):
 
     self.can_do_echolocation = True
 
-     #echolocation sound
-    self.echolocation_sound = pygame.mixer.Sound('audio/core.mp3')
-    self.echolocation_sound.set_volume(0.4) 
-    self.echolocation_channel = pygame.mixer.Channel(1) 
-
-   
-
-   
+    # echolocation sound
+    self.echolocation_sound = pygame.mixer.Sound('../audio/core.mp3')
+    self.echolocation_sound.set_volume(0.4)
+    self.echolocation_channel = pygame.mixer.Channel(1)
 
   def input(self):
     keys = pygame.key.get_pressed()
@@ -89,26 +86,24 @@ class Player(Entity):
     else:
       self.direction.x = 0
 
-    
     if keys[pygame.K_SPACE]:
        self.echolocation_channel.play(self.echolocation_sound)
 
     if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and self.can_do_echolocation:
-        self.last_echolocation_pos = pygame.Vector2(self.hitbox.centerx, self.hitbox.centery)
+        self.last_echolocation_pos = pygame.Vector2(
+            self.hitbox.centerx, self.hitbox.centery)
         self.is_doing_echolocation = True
         self.echolocation_time = pygame.time.get_ticks()
         self.last_update_time = pygame.time.get_ticks()
         # Use fixed duration instead of energy-based
         self.echolocation_duration = self.base_echolocation_duration
-        self.energy_regen_pause_time = pygame.time.get_ticks() + self.energy_regen_pause_duration
-        
-    
+        self.energy_regen_pause_time = pygame.time.get_ticks() + \
+            self.energy_regen_pause_duration
+
     if keys[pygame.K_LCTRL]:
       self.is_crouching = True
     else:
       self.is_crouching = False
-
-
 
   def cooldowns(self):
       current_time = pygame.time.get_ticks()
@@ -117,7 +112,7 @@ class Player(Entity):
       if self.is_doing_echolocation:
           if not hasattr(self, 'echolocation_time'):  # Safety check
               self.echolocation_time = current_time
-              
+
           # Check duration first
           if (current_time - self.echolocation_time) >= self.echolocation_duration:
               self.is_doing_echolocation = False
@@ -163,14 +158,14 @@ class Player(Entity):
 
       self.image = animation[int(self.frame_index)]
       self.rect = self.image.get_rect(center=self.hitbox.center)
-  
+
   def update_speed(self):
     speed_multiplier = 1
     animation_speed_multiplier = 1
     if self.is_crouching:
       speed_multiplier = 0.5
       animation_speed_multiplier = 0.5
-    
+
     self.speed = self.stats["speed"] * speed_multiplier
     self.animation_speed = 0.15 * animation_speed_multiplier
 
@@ -181,4 +176,3 @@ class Player(Entity):
     self.get_status()
     self.animate()
     self.update_speed()
-    

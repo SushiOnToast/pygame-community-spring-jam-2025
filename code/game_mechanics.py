@@ -13,7 +13,7 @@ class Echolocation:
         self.echo_max_radius = 100
         self.echo_current_radius = 0
         self.echo_speed = 0.5
-        self.echo_fade = 255  
+        self.echo_fade = 255
 
         # walking echo properties
         self.walking_sound_base_radius = 1
@@ -25,29 +25,27 @@ class Echolocation:
         self.walking_ripples = []
 
         self.illumination = Illumination()
-        
-        #audio
-        self.footsteps = pygame.mixer.Sound('graphics/audio/footsteps.wav')
-        self.footsteps.set_volume(0.4) 
-        self.footsteps_channel = pygame.mixer.Channel(1)
 
-        
+        # audio
+        self.footsteps = pygame.mixer.Sound('../graphics/audio/footsteps.wav')
+        self.footsteps.set_volume(0.4)
+        self.footsteps_channel = pygame.mixer.Channel(1)
 
     def update_walking_sound(self):
         current_time = pygame.time.get_ticks()
 
         # Spawn new ripple when stepping
-        if self.player.is_moving and not self.player.is_doing_echolocation:
+        if self.player.is_moving and not self.player.is_doing_echolocation and not self.player.is_crouching:
             if not self.footsteps_channel.get_busy():
                 self.footsteps_channel.play(self.footsteps, loops=-1)
             if current_time - self.last_step_time >= self.footstep_interval:
                 self.last_step_time = current_time
                 self.walking_ripples.append({
                     'radius': self.walking_sound_base_radius,
-                    'alpha': 180  
+                    'alpha': 180
                 })
         else:
-        # Stop walking sound if not moving or doing echolocation
+            # Stop walking sound if not moving or doing echolocation
             if self.footsteps_channel.get_busy():
                 self.footsteps_channel.stop()
 
@@ -58,8 +56,8 @@ class Echolocation:
             ripple['alpha'] = max(0, ripple['alpha'] - 3)  # fade out slowly
 
         # Remove fully faded ripples
-        self.walking_ripples = [r for r in self.walking_ripples if r['alpha'] > 0]
-
+        self.walking_ripples = [
+            r for r in self.walking_ripples if r['alpha'] > 0]
 
     def update_echolocation(self):
         if self.player.is_doing_echolocation:
@@ -72,7 +70,6 @@ class Echolocation:
         else:
             self.echo_current_radius = 0
             self.echo_fade = 255
-            
 
     def draw(self, pos, camera_offset, points):
         if not self.player.is_crouching:
@@ -84,17 +81,18 @@ class Echolocation:
                     pygame.draw.circle(
                         walk_surf,
                         color,
-                        (pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
+                        (pos.centerx - camera_offset.x,
+                         pos.centery - camera_offset.y),
                         ripple['radius'],
                     )
                 self.cover_surf.blit(walk_surf, (0, 0))
 
-
             # Create surface for echolocation
             if self.player.is_doing_echolocation:
-                points = [pygame.Vector2(point) - camera_offset for point in points]
+                points = [pygame.Vector2(
+                    point) - camera_offset for point in points]
                 self.illumination.update((pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
-                                            points)
+                                         points)
                 self.illumination.draw(self.cover_surf)
 
     def update(self, pos, camera_offset, obstacles):
@@ -105,8 +103,9 @@ class Echolocation:
 
 class Illumination:
     def __init__(self):
-        
-        self.light_effect = pygame.transform.scale_by(pygame.image.load("graphics/effects/light_effect.png").convert_alpha(), 0.3)
+
+        self.light_effect = pygame.transform.scale_by(pygame.image.load(
+            "../graphics/effects/light_effect.png").convert_alpha(), 0.3)
         self.effect_size = self.light_effect.get_size()
         self.pos = None
         self.polygon = []
@@ -131,8 +130,7 @@ class Illumination:
             surface.blit(self.light_effect, effect_pos)
             surface.blit(new_surface, (0, 0))
 
+
 class EchoBurst:
     def __init__(self, cover_surf, player):
         self.duration = 1500
-        
-
