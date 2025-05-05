@@ -1,7 +1,7 @@
 import pygame
 from settings import *
 import math
-from raycasting import get_hit_points
+from raycasting import *
 
 
 class Echolocation:
@@ -23,6 +23,8 @@ class Echolocation:
         self.footstep_pulse_amount = 5
         self.last_step_time = 0
         self.walking_ripples = []
+
+        self.illumination = Illumination()
 
     def update_walking_sound(self):
         current_time = pygame.time.get_ticks()
@@ -59,7 +61,7 @@ class Echolocation:
             self.echo_fade = 255
             
 
-    def draw(self, pos, camera_offset, obstacles):
+    def draw(self, pos, camera_offset, points):
         if not self.player.is_crouching:
             # Create surface for walking ripples
             if self.player.is_moving and not self.player.is_doing_echolocation:
@@ -77,52 +79,42 @@ class Echolocation:
 
             # Create surface for echolocation
             if self.player.is_doing_echolocation:
-                # echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-                # num_bands = 3 
-                # band_spacing = 10  
-                # band_thickness = 12  
-
-                # for i in reversed(range(num_bands)):
-                #     radius = self.echo_current_radius - (i * band_spacing)
-                #     if radius > 0:
-                #         alpha = max(0, self.echo_fade -
-                #                     ((num_bands - 1 - i) * 40))  
-                #         color = (*COLORKEY, alpha)
-                #         if i == num_bands-1:
-                #             pygame.draw.circle(
-                #                 echo_surf,
-                #                 color,
-                #                 (pos.centerx - camera_offset.x,
-                #                 pos.centery - camera_offset.y),
-                #                 int(radius),
-                #             )
-                #         else:
-                #             pygame.draw.circle(
-                #                 echo_surf,
-                #                 color,
-                #                 (pos.centerx - camera_offset.x,
-                #                 pos.centery - camera_offset.y),
-                #                 int(radius),
-                #                 width=band_thickness  
-                #             )
-                # self.cover_surf.blit(echo_surf, (0, 0))
-                echo_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-                self.echo_fade -= 40
-                color = (*COLORKEY, 150)
-
-                # Get hit points in world coordinates
-                hit_points = get_hit_points(self.player.hitbox.center, 50, list(obstacles), simplify=True)
-
-                # Convert hit points to screen coordinates using camera offset
-                screen_points = [pygame.Vector2(point) - camera_offset for point in hit_points]
-
-                # Draw polygon if valid
-                if len(screen_points) >= 3:
-                    pygame.draw.polygon(echo_surf, color, screen_points)
-
-                self.cover_surf.blit(echo_surf, (0, 0))
+                points = [pygame.Vector2(point) - camera_offset for point in points]
+                self.illumination.update((pos.centerx - camera_offset.x, pos.centery - camera_offset.y),
+                                            points)
+                self.illumination.draw(self.cover_surf)
 
     def update(self, pos, camera_offset, obstacles):
         self.update_walking_sound()
         self.update_echolocation()
         self.draw(pos, camera_offset, obstacles)
+
+
+class Illumination:
+    def __init__(self):
+        
+        self.light_effect = pygame.transform.scale_by(pygame.image.load("../graphics/effects/light_effect.png").convert_alpha(), 0.25)
+        self.effect_size = self.light_effect.get_size()
+        self.pos = None
+        self.polygon = []
+
+    def update(self, pos, polygon):
+        self.pos = pos
+        self.polygon = polygon
+
+    def draw(self, surface):
+        if self.pos is not None:
+            new_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+            if self.polygon:
+                pygame.draw.polygon(new_surface, (COLORKEY), self.polygon)
+                # for point in self.polygon:
+                #     pygame.draw.line(new_surface, (0, 255, 0), self.pos, point)
+
+            new_surface.set_colorkey(COLORKEY)
+
+            effect_pos = (self.pos[0] - self.effect_size[0] // 2,
+                          self.pos[1] - self.effect_size[1] // 2)
+
+            surface.blit(self.light_effect, effect_pos)
+            surface.blit(new_surface, (0, 0))
+

@@ -4,6 +4,7 @@ from tile import Tile
 from player import Player
 from ui import UI
 from enemy import Enemy
+from raycasting import *
 
 class Level:
 
@@ -38,13 +39,28 @@ class Level:
           self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
         elif col == 'e':
           Enemy('slime', (x, y), [self.visible_sprites],self.obstacle_sprites)
- 
+
+  def get_raycasting_points(self, obstacles):
+    obstacle_rects = [obstacle.rect for obstacle in obstacles]
+    edges = get_all_relevant_edges(obstacle_rects)
+
+    # Corrected: apply camera offset to edge lines
+    for edge in edges:
+        start = pygame.Vector2(edge[0]) - self.visible_sprites.offset
+        end = pygame.Vector2(edge[1]) - self.visible_sprites.offset
+
+    # Apply camera offset to raycasting points
+    points = Raycaster.find_all_intersects(self.player.hitbox, edges)
+
+    return points
+
 
   def draw_overlay(self):
     self.cover_surf.fill('black')
     self.cover_surf.set_colorkey(COLORKEY)
-    
-    self.player.echolocation.update(self.player.hitbox, self.visible_sprites.offset, self.obstacle_sprites)
+
+    points = self.get_raycasting_points(self.obstacle_sprites)
+    self.player.echolocation.update(self.player.hitbox, self.visible_sprites.offset, points)
     
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
     
@@ -86,7 +102,7 @@ class Level:
 
   def render(self):
     # separate player and background sprites
-    self.visible_sprites.custom_draw(self.player)      
+    self.visible_sprites.custom_draw(self.player) # doesnt work because scroll is still needed
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
 
