@@ -9,6 +9,7 @@ class UI:
         # general
         self.display_surface = pygame.display.get_surface()
         self.font = pygame.font.Font(UI_FONT, UI_FONT_SIZE)
+        self.death_font = pygame.font.Font(UI_FONT, 25)
         
         # bar setup
         self.health_bar_rect = pygame.Rect(
@@ -30,9 +31,10 @@ class UI:
         ).convert_alpha()
 
         # Create button instances
-        self.start_button = Button(WINDOW_WIDTH/2, 320, self.start_img)
-        self.unpause_button = Button(WINDOW_WIDTH/2, 320, self.unpause_img)
-        self.exit_button = Button(WINDOW_WIDTH/2, 410, self.exit_img)
+        self.start_button = Button(WINDOW_WIDTH - 330, 320, self.start_img)
+        self.unpause_button = Button(WINDOW_WIDTH - 330, 320, self.unpause_img)
+        self.death_exit_button = Button(WINDOW_WIDTH - 150, 50, self.exit_img, 5)  # New death screen exit button  
+        self.exit_button = Button(WINDOW_WIDTH - 330, 410, self.exit_img)
 
     def show_bar(self, current, max_amount, bg_rect, color):
         # draw bg
@@ -72,17 +74,21 @@ class UI:
         draw_text(self.display_surface, str(time_survived), self.menu_font, TEXT_COLOR, WINDOW_WIDTH-50, 50)
 
     def draw_death_screen(self, screen, time_survived):
-        screen.fill(BG_COLOR)
-        draw_text(screen, "You died!", self.menu_font, TEXT_COLOR, 465, 100)
-        draw_text(screen, str(time_survived), self.menu_font, TEXT_COLOR, 465, 150)
-        exit_clicked = self.exit_button.update(screen)
+
+        death_img = pygame.transform.scale_by(pygame.image.load(f"../graphics/menus/death.png").convert(), 0.84)
+        screen.fill(MENU_BG_COLOR)
+        screen.blit(death_img)
+        draw_text(screen, f"{str(int(time_survived))} seconds survived", self.death_font, TEXT_COLOR, WINDOW_WIDTH//2-140, WINDOW_HEIGHT-70)
+        exit_clicked = self.death_exit_button.update(screen)
 
         return exit_clicked
 
     def draw_menu(self, screen, state):
 
-        screen.fill(BG_COLOR)  # Background color for menu
-        draw_text(screen, "Echospace", self.menu_font, TEXT_COLOR, 465, 100)
+        menu_img = pygame.transform.scale_by(pygame.image.load(f"../graphics/menus/{state}_menu.png").convert(), 0.75)
+
+        screen.fill(MENU_BG_COLOR)  # Background color for menu
+        screen.blit(menu_img)
         if state == "start":
             start_pause_clicked = self.start_button.update(screen)
         elif state == "pause":
