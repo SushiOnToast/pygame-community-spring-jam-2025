@@ -72,6 +72,10 @@ def main():
                 exit_clicked = ui.draw_death_screen(screen, game.level.time_survived)
                 if exit_clicked:
                     run = False
+            if game.state == 'win':
+                ui.win_screen(screen,game.state)
+                pygame.display.update()
+
             else:
                 # Draw menu
                 start_clicked, exit_clicked = ui.draw_menu(screen, game.state)

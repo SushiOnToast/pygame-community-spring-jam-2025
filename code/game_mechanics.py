@@ -93,7 +93,7 @@ class Echolocation:
 class Illumination:
     def __init__(self):
         
-        self.light_effect = pygame.transform.scale_by(pygame.image.load("../graphics/effects/light_effect.png").convert_alpha(), 0.3)
+        self.light_effect = pygame.transform.scale_by(pygame.image.load("graphics/effects/light_effect.png").convert_alpha(), 0.3)
         self.effect_size = self.light_effect.get_size()
         self.pos = None
         self.polygon = []

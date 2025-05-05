@@ -7,6 +7,7 @@ from enemy import *
 from raycasting import *
 from support import *
 from resonasce import Resonance
+from finalcore import FinalResonance
 
 
 class Level:
@@ -16,7 +17,7 @@ class Level:
     self.time_survived = 0
     self.start_time = pygame.time.get_ticks()
 
-    self.level_index = 3
+    self.level_index = 1
 
     # overlay mask
     self.cover_surf = pygame.Surface((WIDTH, HEIGHT))
@@ -54,19 +55,23 @@ class Level:
                 self.visible_sprites], self.obstacle_sprites)
         if col == '2':
           BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
-        if col != "-1" and col != "295" and col != "1" and col != "2":
+        if col != "-1" and col != "295" and col != "1" and col != "2" and col!= '200' and col!='202':
           Tile((x, y), [self.obstacle_sprites], "invisible")
         if col == '200':
-           Resonance((x,y),[self.visible_sprites])
+           self.resonance = Resonance((x,y),[self.visible_sprites])
+        if col =='202' and self.level_index == 3:
+           self.finalresonance = FinalResonance((x,y),[self.visible_sprites])
 
   def switch_room(self):
     current_time = pygame.time.get_ticks()
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_r] and current_time - self.last_switch_time > self.switch_cooldown:
+    if pygame.sprite.collide_rect(self.player, self.resonance):
         self.level_index = (self.level_index % 3) + 1  # Cycle between 1-3
         self.last_switch_time = current_time
         self.create_map()
+
+    
         
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -147,6 +152,12 @@ class Level:
     if current_state == "running":
       if self.player.health <= 0:
           state = "dead"
+      # if pygame.sprite.collide_rect(self.player, self.resonance):
+      #     state = "nextlevel"
+      if hasattr(self, 'finalresonance') and pygame.sprite.collide_rect(self.player, self.finalresonance):
+         state = "win"
+    
+      
 
     return state
 
