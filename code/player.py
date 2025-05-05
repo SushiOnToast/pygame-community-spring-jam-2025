@@ -52,7 +52,7 @@ class Player(Entity):
     # tracking time
     self.last_update_time = pygame.time.get_ticks()
     self.zero_energy_time = None
-    self.echolocation_cooldown_after_zero = 58000
+    self.echolocation_cooldown_after_zero = 4000
     self.energy_regen_pause_time = 0  # timestamp until which regen is paused
     self.energy_regen_pause_duration = 1000  # 1 second in milliseconds
 

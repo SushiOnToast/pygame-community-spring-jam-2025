@@ -46,14 +46,14 @@ class Level:
         if col == "295":
           self.player = Player(
             (x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
-        if col != "-1" and col != "295":
-          Tile((x, y), [self.obstacle_sprites], "invisible")
-        elif col == 's':
+        if col == '1':
           Enemy('stalker', (x, y), [
                 self.visible_sprites], self.obstacle_sprites)
-        elif col == 'b':
+        if col == '2':
           BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
-
+        if col != "-1" and col != "295" and col != "1" and col != "2":
+          Tile((x, y), [self.obstacle_sprites], "invisible")
+        
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
     edges = get_all_relevant_edges(obstacle_rects)
