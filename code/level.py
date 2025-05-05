@@ -35,33 +35,24 @@ class Level:
 
     # death sound
     self.death_sound = pygame.mixer.Sound(
-        '../graphics/audio/8-bit-video-game-lose-sound-version-1-145828.mp3')
+        'graphics/audio/8-bit-video-game-lose-sound-version-1-145828.mp3')
     self.death_sound.set_volume(0.4)
     self.death_channel = pygame.mixer.Channel(1)
 
     # win sound
-    self.win_sound = pygame.mixer.Sound('../audio/winsound.mp3')
+    self.win_sound = pygame.mixer.Sound('audio/winsound.mp3')
     self.win_sound.set_volume(0.4)
     self.win_channel = pygame.mixer.Channel(1)
 
     # core sound
-    self.core_sound = pygame.mixer.Sound('../audio/core.mp3')
+    self.core_sound = pygame.mixer.Sound('audio/core.mp3')
     self.core_sound.set_volume(0.4)
     self.core_channel = pygame.mixer.Channel(1)
 
-    # #overlay images
-    # if self.level_index == 1:
-    #   self.overlay_image = pygame.image.load("../graphics/overlays/level1.jpeg").convert_alpha()
-    #   self.overlay_image_scaled = pygame.transform.scale_by(self.overlay_image,0.3)
-    #   self.overlay_rect = self.overlay_image_scaled.get_rect(midtop=(0, 0))
-    # elif self.level_index == 2:
-    #   self.overlay_image = pygame.image.load("../graphics/overlays/level2.jpeg").convert_alpha()
-    #   self.overlay_rect = self.overlay_image.get_rect(midtop=(0, 0))
-    # elif self.level_index ==3:
-    #     self.overlay_image = pygame.image.load("../graphics/overlays/level3.jpeg").convert_alpha()
-    #     self.overlay_rect = self.overlay_image.get_rect(midtop=(0, 0))
-    # else:
-    #    self.overlay_image = None
+    self.font = pygame.font.Font(UI_FONT, 10)  # Adjust size if needed
+
+
+  
 
   def create_map(self):
     self.visible_sprites = YSortCameraGroup(
@@ -69,9 +60,9 @@ class Level:
     self.obstacle_sprites = pygame.sprite.Group()
 
     layouts = {
-        "boundary1": import_csv_layout("../map/boundary1.csv"),
-        "boundary2": import_csv_layout("../map/boundary2.csv"),
-        "boundary3": import_csv_layout("../map/boundary3.csv"),
+        "boundary1": import_csv_layout("map/boundary1.csv"),
+        "boundary2": import_csv_layout("map/boundary2.csv"),
+        "boundary3": import_csv_layout("map/boundary3.csv"),
     }
 
     for row_index, row in enumerate(layouts[f"boundary{self.level_index}"]):
@@ -170,12 +161,15 @@ class Level:
     self.visible_sprites.custom_draw(self.player)
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
+
     if self.player.last_echolocation_pos and SHOW_ECHOLOCATION_POINT:
       pygame.draw.circle(self.display_surface, "red", pygame.Vector2(
           self.player.last_echolocation_pos) - self.visible_sprites.offset, 5)
-
-    # if self.overlay_image and self.overlay_rect:
-    #   self.display_surface.blit(self.overlay_image, self.overlay_rect)
+      
+      # Draw current level text
+    level_text = self.font.render(f"Level {self.level_index}", True, TEXT_COLOR)
+    text_rect = level_text.get_rect(center=(WIDTH // 2, 20))
+    self.display_surface.blit(level_text, text_rect)
 
   def update_time_survived(self):
      current_time = pygame.time.get_ticks()
@@ -217,7 +211,7 @@ class YSortCameraGroup(pygame.sprite.Group):
 
         # Pre-load and convert floor surface
         self.floor_surface = pygame.image.load(
-            f"../graphics/map/map{level_index}.png").convert()
+            f"graphics/map/map{level_index}.png").convert()
         self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
 
         # Cache for sprite sorting
