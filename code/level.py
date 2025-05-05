@@ -6,6 +6,7 @@ from ui import UI
 from enemy import Enemy
 from raycasting import *
 
+
 class Level:
 
   def __init__(self, surface):
@@ -17,7 +18,7 @@ class Level:
     self.visible_sprites = YSortCameraGroup(self.display_surface)
     self.obstacle_sprites = pygame.sprite.Group()
 
-    # overlay mask 
+    # overlay mask
     self.cover_surf = pygame.Surface((WIDTH, HEIGHT))
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
 
@@ -35,10 +36,14 @@ class Level:
         y = row_index * TILESIZE
         if col == 'x':
           Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "test")
-        if col == 'p' :
-          self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
-        elif col == 'e':
-          Enemy('slime', (x, y), [self.visible_sprites],self.obstacle_sprites)
+        if col == 'p':
+          self.player = Player(
+              (x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
+        elif col == 's':
+          Enemy('stalker', (x, y), [
+                self.visible_sprites], self.obstacle_sprites)
+        elif col == 'b':
+          Enemy('blind', (x, y), [self.visible_sprites], self.obstacle_sprites)
 
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -54,21 +59,21 @@ class Level:
 
     return points
 
-
   def draw_overlay(self):
     self.cover_surf.fill('black')
     self.cover_surf.set_colorkey(COLORKEY)
 
     points = self.get_raycasting_points(self.obstacle_sprites)
-    self.player.echolocation.update(self.player.hitbox, self.visible_sprites.offset, points)
-    
+    self.player.echolocation.update(
+        self.player.hitbox, self.visible_sprites.offset, points)
+
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
-    
+
     if TESTING_OVERLAY:
-      self.display_surface.blit(self.cover_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+      self.display_surface.blit(
+          self.cover_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-
-  #collison thing
+  # collison thing
   def check_player_enemy_collisions(self):
     current_time = pygame.time.get_ticks()
 
@@ -87,22 +92,20 @@ class Level:
             if self.player.hitbox.colliderect(sprite.hitbox):
                 damage = sprite.attack_damage * self.damage_rate * delta_time
                 self.player.health -= damage
-                self.player.health = max(0, self.player.health) 
-            
-           
+                self.player.health = max(0, self.player.health)
+
                 now = pygame.time.get_ticks()
                 if hasattr(sprite, 'attack_sound'):
                     if now - sprite.last_sound_time > sprite.sound_cooldown:
                         sprite.attack_sound.play()
                         sprite.last_sound_time = now
 
-
-      self.last_damage_time = current_time     
-
+      self.last_damage_time = current_time
 
   def render(self):
     # separate player and background sprites
-    self.visible_sprites.custom_draw(self.player) # doesnt work because scroll is still needed
+    # doesnt work because scroll is still needed
+    self.visible_sprites.custom_draw(self.player)
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
 
@@ -110,15 +113,14 @@ class Level:
      current_time = pygame.time.get_ticks()
      self.time_survived = (current_time - self.start_time)/1000
 
-  
   def detect_state(self, current_state):
     state = current_state
     if current_state == "running":
       if self.player.health <= 0:
           state = "dead"
-      
+
     return state
-    
+
   def run(self):
     self.render()
     self.visible_sprites.update()
@@ -135,21 +137,23 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.half_width = self.display_surface.get_size()[0] // 2
         self.half_height = self.display_surface.get_size()[1] // 2
         self.offset = pygame.math.Vector2()
-        
+
         # Add these new variables for smooth camera
         self.camera_target = pygame.math.Vector2()
-        self.camera_speed = 0.1  
+        self.camera_speed = 0.1
 
     def custom_draw(self, player):
       # Update camera target position
       target_x = player.rect.centerx - self.half_width
       target_y = player.rect.centery - self.half_height
       self.camera_target = pygame.math.Vector2(target_x, target_y)
-      
+
       # Smoothly move camera to target (lerp)
-      self.offset.x += (self.camera_target.x - self.offset.x) * self.camera_speed
-      self.offset.y += (self.camera_target.y - self.offset.y) * self.camera_speed
-      
+      self.offset.x += (self.camera_target.x -
+                        self.offset.x) * self.camera_speed
+      self.offset.y += (self.camera_target.y -
+                        self.offset.y) * self.camera_speed
+
       # Draw background sprites first
       for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
           if not isinstance(sprite, Player):
@@ -161,8 +165,8 @@ class YSortCameraGroup(pygame.sprite.Group):
       offset_position = player.rect.topleft - self.offset
       self.display_surface.blit(player.image, offset_position)
 
-
-    def enemy_update(self,player):
-      enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']
+    def enemy_update(self, player):
+      enemy_sprites = [sprite for sprite in self.sprites() if hasattr(
+          sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
       for enemy in enemy_sprites:
-        enemy.enemy_update(player) 
+        enemy.enemy_update(player)
