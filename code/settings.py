@@ -26,7 +26,7 @@ BAR_HEIGHT = 20
 HEALTH_BAR_WIDTH = 200
 ENERGY_BAR_WIDTH = 140
 ITEM_BOX_SIZE = 80
-UI_FONT = '../graphics/font/Minecraftia-Regular.ttf'
+UI_FONT = 'graphics/font/Minecraftia-Regular.ttf'
 UI_FONT_SIZE = 18
 UI_BG_COLOR = '#222222'
 UI_BORDER_COLOUR = '#111111'
@@ -70,8 +70,8 @@ WORLD_MAP = [
         ' ', ' ', ' ', ' ', ' ', 'x'
     ],
     [
-        'x', ' ', ' ', 'x', ' ', ' ', ' ', ' ', 'p', 's', ' ', ' ', ' ', 'x',
-        ' ', ' ', ' ', ' ', 'e', 'x'
+        'x', ' ', ' ', 'x', ' ', ' ', ' ', ' ', 'p', 'b', ' ', ' ', ' ', 'x',
+        ' ', ' ', ' ', ' ', 's', 'x'
     ],
     [
         'x', ' ', ' ', 'x', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'x',
