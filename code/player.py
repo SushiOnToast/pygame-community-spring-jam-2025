@@ -59,6 +59,11 @@ class Player(Entity):
 
     self.can_do_echolocation = True
 
+     #echolocation sound
+    self.echolocation_sound = pygame.mixer.Sound('audio/core.mp3')
+    self.echolocation_sound.set_volume(0.4) 
+    self.echolocation_channel = pygame.mixer.Channel(1) 
+
    
 
    
@@ -83,7 +88,10 @@ class Player(Entity):
       self.status = "right"
     else:
       self.direction.x = 0
+
     
+    if keys[pygame.K_SPACE]:
+       self.echolocation_channel.play(self.echolocation_sound)
 
     if keys[pygame.K_SPACE] and not self.is_doing_echolocation and self.energy > 5 and self.can_do_echolocation:
         self.last_echolocation_pos = pygame.Vector2(self.hitbox.centerx, self.hitbox.centery)
@@ -93,6 +101,7 @@ class Player(Entity):
         # Use fixed duration instead of energy-based
         self.echolocation_duration = self.base_echolocation_duration
         self.energy_regen_pause_time = pygame.time.get_ticks() + self.energy_regen_pause_duration
+        
     
     if keys[pygame.K_LCTRL]:
       self.is_crouching = True
