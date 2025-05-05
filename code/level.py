@@ -37,7 +37,9 @@ class Level:
         if col == 'p' :
           self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
         elif col == 'e':
-          Enemy('slime', (x, y), [self.visible_sprites],self.obstacle_sprites)
+          Enemy('stalker', (x, y), [self.visible_sprites],self.obstacle_sprites)
+        elif col == 's':
+          Enemy('blind', (x, y), [self.visible_sprites], self.obstacle_sprites)
  
 
   def draw_overlay(self):

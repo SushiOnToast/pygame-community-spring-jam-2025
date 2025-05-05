@@ -11,20 +11,6 @@ class Enemy(Entity):
         super().__init__(groups)
         self.sprite_type = 'enemy'
 
-        #graphics setup
-        #self.import_graphics(monster_name)
-        self.spritesheet = pygame.image.load(
-        "graphics/player/Untitled_Artwork 12.png").convert_alpha()
-        self.animations = import_character_sprites(
-            self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
-        self.status = "down_idle"
-        self.image = self.animations[self.status][self.frame_index]
-
-        #movement
-        self.rect = self.image.get_rect(topleft = pos)
-        self.hitbox = self.rect.inflate(0,-10)
-        self.obstacle_sprites = obstacle_sprites
-
         #stats
         self.monster_name = monster_name
         monster_info = monster_data[self.monster_name]
@@ -36,8 +22,24 @@ class Enemy(Entity):
         self.attack_radius = monster_info['attack_radius']
         self.notice_radius = monster_info['notice_radius']
         self.attack_type = monster_info['attack_type']
+        self.source_path = monster_info['sprite_path']
 
         self.direction = pygame.math.Vector2()
+
+        #graphics setup
+        #self.import_graphics(monster_name)
+        self.spritesheet = pygame.image.load(self.source_path).convert_alpha()
+        self.animations = import_character_sprites(
+            self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
+        self.status = "down_idle"
+        self.image = self.animations[self.status][self.frame_index]
+
+        #movement
+        self.rect = self.image.get_rect(topleft = pos)
+        self.hitbox = self.rect.inflate(0,-10)
+        self.obstacle_sprites = obstacle_sprites
+
+
 
         #attack sound
         self.attack_sound = pygame.mixer.Sound(monster_info['attack_sound'])
