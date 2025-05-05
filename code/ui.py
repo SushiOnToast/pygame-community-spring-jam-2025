@@ -103,12 +103,20 @@ class UI:
         return exit_clicked
 
     def draw_menu(self, screen, state):
-
+        # Load and scale the menu image
         menu_img = pygame.transform.scale_by(pygame.image.load(
             f"../graphics/menus/{state}_menu.png").convert(), 0.75)
 
-        screen.fill(MENU_BG_COLOR)  # Background color for menu
-        screen.blit(menu_img)
+        # Calculate the position to center the image on the screen
+        menu_rect = menu_img.get_rect(topleft=(0, screen.get_height() // 2 - menu_img.get_height() // 2))
+
+        # Fill the screen with the menu background color
+        screen.fill(MENU_BG_COLOR)
+        
+        # Blit the menu image at the calculated position
+        screen.blit(menu_img, menu_rect)
+
+        # Handle button presses for start and exit
         if state == "start":
             start_pause_clicked = self.start_button.update(screen)
         elif state == "pause":
@@ -117,3 +125,4 @@ class UI:
         exit_clicked = self.exit_button.update(screen)
 
         return start_pause_clicked, exit_clicked
+

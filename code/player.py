@@ -15,7 +15,7 @@ class Player(Entity):
 
     # graphics and animation
     self.spritesheet = pygame.image.load(
-        "../graphics/player/player.png").convert_alpha()
+        "graphics/player/player.png").convert_alpha()
     self.animations = import_character_sprites(
         self.spritesheet, self.spritesheet.get_width()/4, self.spritesheet.get_height()/4)
     self.status = "down_idle"
@@ -61,7 +61,7 @@ class Player(Entity):
     self.can_do_echolocation = True
 
     # echolocation sound
-    self.echolocation_sound = pygame.mixer.Sound('../audio/core.mp3')
+    self.echolocation_sound = pygame.mixer.Sound('audio/core.mp3')
     self.echolocation_sound.set_volume(0.4)
     self.echolocation_channel = pygame.mixer.Channel(1)
 
