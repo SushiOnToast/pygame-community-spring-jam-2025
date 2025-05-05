@@ -15,8 +15,10 @@ class Level:
     self.time_survived = 0
     self.start_time = pygame.time.get_ticks()
 
+    self.level_index = 2
+
     # sprite group setup
-    self.visible_sprites = YSortCameraGroup(self.display_surface)
+    self.visible_sprites = YSortCameraGroup(self.display_surface, self.level_index)
     self.obstacle_sprites = pygame.sprite.Group()
 
     # overlay mask
@@ -32,24 +34,24 @@ class Level:
 
   def create_map(self):
     layouts = {
-       "boundary": import_csv_layout("../map/obstacles_obstavles.csv"),
+        "boundary1": import_csv_layout("../map/obstacles_obstavles.csv"),
+        "boundary2": import_csv_layout("../map/obstacles2_obstacles2.csv"),
     }
 
-    for style, layout in layouts.items():
-      for row_index, row in enumerate(layout):
-        for col_index, col in enumerate(row):
-          if col != -1:
-            x = col_index * TILESIZE
-            y = row_index * TILESIZE
-            Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "invisible")
-          # elif col == 's':
-          #   Enemy('stalker', (x, y), [
-          #         self.visible_sprites], self.obstacle_sprites)
-          # elif col == 'b':
-          #   BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
+    for row_index, row in enumerate(layouts[f"boundary{self.level_index}"]):
+      for col_index, col in enumerate(row):
+        x = col_index * TILESIZE
+        y = row_index * TILESIZE
+        if col != "-1":
+          Tile((x, y), [self.obstacle_sprites], "invisible")
+        elif col == 's':
+          Enemy('stalker', (x, y), [
+                self.visible_sprites], self.obstacle_sprites)
+        elif col == 'b':
+          BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
 
     self.player = Player(
-          (360, 360), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
+        (100, 100), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
 
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -69,9 +71,9 @@ class Level:
     self.cover_surf.fill('black')
     self.cover_surf.set_colorkey(COLORKEY)
 
-    points = self.get_raycasting_points(self.obstacle_sprites)
-    self.player.echolocation.update(
-        self.player.hitbox, self.visible_sprites.offset, points)
+    # points = self.get_raycasting_points(self.obstacle_sprites)
+    # self.player.echolocation.update(
+    #     self.player.hitbox, self.visible_sprites.offset, points)
 
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
 
@@ -118,7 +120,8 @@ class Level:
     self.draw_overlay()
     self.visible_sprites.draw_player(self.player)
     if self.player.last_echolocation_pos and SHOW_ECHOLOCATION_POINT:
-      pygame.draw.circle(self.display_surface, "red", pygame.Vector2(self.player.last_echolocation_pos) - self.visible_sprites.offset, 5)
+      pygame.draw.circle(self.display_surface, "red", pygame.Vector2(
+          self.player.last_echolocation_pos) - self.visible_sprites.offset, 5)
 
   def update_time_survived(self):
      current_time = pygame.time.get_ticks()
@@ -142,40 +145,51 @@ class Level:
 
 
 class YSortCameraGroup(pygame.sprite.Group):
-    def __init__(self, surface):
+    def __init__(self, surface, level_index):
         super().__init__()
         self.display_surface = surface
         self.half_width = self.display_surface.get_size()[0] // 2
         self.half_height = self.display_surface.get_size()[1] // 2
         self.offset = pygame.math.Vector2()
-
-        # Add these new variables for smooth camera
         self.camera_target = pygame.math.Vector2()
         self.camera_speed = 0.1
 
-        self.floor_surface = pygame.image.load("../graphics/map/map.png").convert()
+        # Pre-load and convert floor surface
+        self.floor_surface = pygame.image.load(f"../graphics/map/map{level_index}.png").convert()
         self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
+        
+        # Cache for sprite sorting
+        self.sorted_sprites = []
+        self.last_update_time = 0
+        self.sort_interval = 100  # Sort every 100ms
 
     def custom_draw(self, player):
-      # Update camera target position
-      target_x = player.rect.centerx - self.half_width
-      target_y = player.rect.centery - self.half_height
-      self.camera_target = pygame.math.Vector2(target_x, target_y)
+        # Update camera target position
+        self.camera_target.x = player.rect.centerx - self.half_width
+        self.camera_target.y = player.rect.centery - self.half_height
 
-      # Smoothly move camera to target (lerp)
-      self.offset.x += (self.camera_target.x -
-                        self.offset.x) * self.camera_speed
-      self.offset.y += (self.camera_target.y -
-                        self.offset.y) * self.camera_speed
-      
-      floor_offset_pos = self.floor_rect.topleft - self.offset
-      self.display_surface.blit(self.floor_surface, floor_offset_pos)
+        # Use integer positions for smoother rendering
+        self.offset.x += (self.camera_target.x - self.offset.x) * self.camera_speed
+        self.offset.y += (self.camera_target.y - self.offset.y) * self.camera_speed
+        offset_int = pygame.math.Vector2(int(self.offset.x), int(self.offset.y))
 
-      # Draw background sprites first
-      for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
-          if not isinstance(sprite, Player):
-              offset_position = sprite.rect.topleft - self.offset
-              self.display_surface.blit(sprite.image, offset_position)
+        # Draw floor
+        floor_offset_pos = self.floor_rect.topleft - offset_int
+        self.display_surface.blit(self.floor_surface, floor_offset_pos)
+
+        # Update sprite sorting only periodically
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_update_time > self.sort_interval:
+            self.sorted_sprites = sorted(
+                [sprite for sprite in self.sprites() if not isinstance(sprite, Player)],
+                key=lambda sprite: sprite.rect.centery
+            )
+            self.last_update_time = current_time
+
+        # Draw sprites using cached sorting
+        for sprite in self.sorted_sprites:
+            offset_position = sprite.rect.topleft - offset_int
+            self.display_surface.blit(sprite.image, offset_position)
 
     def draw_player(self, player):
       # Draw player after overlay
