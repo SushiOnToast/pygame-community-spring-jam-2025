@@ -23,6 +23,7 @@ Controls
 ⸻
 
 Setup Instructions
+
 	1.	Clone this repository
 
 	2.	Install dependencies: pip install pygame
