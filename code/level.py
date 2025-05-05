@@ -6,6 +6,7 @@ from ui import UI
 from enemy import *
 from raycasting import *
 from support import *
+from resonasce import Resonance
 
 
 class Level:
@@ -15,7 +16,7 @@ class Level:
     self.time_survived = 0
     self.start_time = pygame.time.get_ticks()
 
-    self.level_index = 1
+    self.level_index = 3
 
     # overlay mask
     self.cover_surf = pygame.Surface((WIDTH, HEIGHT))
@@ -36,9 +37,9 @@ class Level:
     self.obstacle_sprites = pygame.sprite.Group()
 
     layouts = {
-        "boundary1": import_csv_layout("../map/boundary1.csv"),
-        "boundary2": import_csv_layout("../map/boundary2.csv"),
-        "boundary3": import_csv_layout("../map/boundary3.csv"),
+        "boundary1": import_csv_layout("map/boundary1.csv"),
+        "boundary2": import_csv_layout("map/boundary2.csv"),
+        "boundary3": import_csv_layout("map/boundary3.csv"),
     }
 
     for row_index, row in enumerate(layouts[f"boundary{self.level_index}"]):
@@ -55,6 +56,8 @@ class Level:
           BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
         if col != "-1" and col != "295" and col != "1" and col != "2":
           Tile((x, y), [self.obstacle_sprites], "invisible")
+        if col == '200':
+           Resonance((x,y),[self.visible_sprites])
 
   def switch_room(self):
     current_time = pygame.time.get_ticks()
@@ -168,7 +171,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.camera_speed = 0.1
 
         # Pre-load and convert floor surface
-        self.floor_surface = pygame.image.load(f"../graphics/map/map{level_index}.png").convert()
+        self.floor_surface = pygame.image.load(f"graphics/map/map{level_index}.png").convert()
         self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
         
         # Cache for sprite sorting
