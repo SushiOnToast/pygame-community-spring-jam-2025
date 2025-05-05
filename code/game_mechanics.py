@@ -118,3 +118,8 @@ class Illumination:
             surface.blit(self.light_effect, effect_pos)
             surface.blit(new_surface, (0, 0))
 
+class EchoBurst:
+    def __init__(self, cover_surf, player):
+        self.duration = 1500
+        
+

@@ -15,11 +15,7 @@ class Level:
     self.time_survived = 0
     self.start_time = pygame.time.get_ticks()
 
-    self.level_index = 3
-
-    # sprite group setup
-    self.visible_sprites = YSortCameraGroup(self.display_surface, self.level_index)
-    self.obstacle_sprites = pygame.sprite.Group()
+    self.level_index = 1
 
     # overlay mask
     self.cover_surf = pygame.Surface((WIDTH, HEIGHT))
@@ -32,7 +28,13 @@ class Level:
 
     self.last_damage_time = pygame.time.get_ticks()
 
+    self.last_switch_time = 0
+    self.switch_cooldown = 500  # milliseconds
+
   def create_map(self):
+    self.visible_sprites = YSortCameraGroup(self.display_surface, self.level_index)
+    self.obstacle_sprites = pygame.sprite.Group()
+
     layouts = {
         "boundary1": import_csv_layout("../map/boundary1.csv"),
         "boundary2": import_csv_layout("../map/boundary2.csv"),
@@ -53,6 +55,15 @@ class Level:
           BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
         if col != "-1" and col != "295" and col != "1" and col != "2":
           Tile((x, y), [self.obstacle_sprites], "invisible")
+
+  def switch_room(self):
+    current_time = pygame.time.get_ticks()
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_r] and current_time - self.last_switch_time > self.switch_cooldown:
+        self.level_index = (self.level_index % 3) + 1  # Cycle between 1-3
+        self.last_switch_time = current_time
+        self.create_map()
         
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
@@ -137,6 +148,7 @@ class Level:
     return state
 
   def run(self):
+    self.switch_room()
     self.render()
     self.visible_sprites.update()
     self.visible_sprites.enemy_update(self.player)
