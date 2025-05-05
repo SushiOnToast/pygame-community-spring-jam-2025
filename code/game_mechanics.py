@@ -29,7 +29,9 @@ class Echolocation:
         #audio
         self.footsteps = pygame.mixer.Sound('graphics/audio/footsteps.wav')
         self.footsteps.set_volume(0.4) 
-        self.footsteps_channel = pygame.mixer.Channel(1)  
+        self.footsteps_channel = pygame.mixer.Channel(1)
+
+        
 
     def update_walking_sound(self):
         current_time = pygame.time.get_ticks()
