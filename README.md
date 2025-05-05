@@ -15,12 +15,16 @@ Are you ready to echo through the void?
 Controls
 
 ‣ WASD — Move
+
 ‣ Spacebar — Echolocation Pulse
+
 ‣ Ctrl — Crouch (reduce noise, evade detection)
 
 ⸻
 
 Setup Instructions
 	1.	Clone this repository
+
 	2.	Install dependencies: pip install pygame
+
 	3.	Run the game: python main.py (inside the code folder)
