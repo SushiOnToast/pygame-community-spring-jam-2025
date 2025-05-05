@@ -26,6 +26,11 @@ class Enemy(Entity):
 
         self.direction = pygame.math.Vector2()
 
+        self.vertical_direction = 1  # 1 means down, -1 means up
+        self.vertical_speed = 1
+        self.max_float_range = 50  # max pixels to move up/down from original position
+        self.float_origin = pos[1]
+
         #graphics setup
         #self.import_graphics(monster_name)
         self.spritesheet = pygame.image.load(self.source_path).convert_alpha()
@@ -75,8 +80,17 @@ class Enemy(Entity):
         #this one needs tweaking
         if self.status == 'up_idle': #supposed to be right
             print('attack')
-        elif self.status == 'right': #supposed to be left
+        elif self.status == 'right' and self.monster_name == 'stalker': #supposed to be left
             self.direction = self.get_player_distance_direction(player)[1]
+        elif self.status == 'right' and self.monster_name == 'blind':
+            self.direction.x = 0
+            self.direction.y = self.vertical_direction
+
+            # Reverse direction at bounds
+            if self.rect.y > self.float_origin + self.max_float_range:
+                self.vertical_direction = -1  # go up
+            elif self.rect.y < self.float_origin - self.max_float_range:
+                self.vertical_direction = 1  # go down
         else:
             self.direction = pygame.math.Vector2()
 

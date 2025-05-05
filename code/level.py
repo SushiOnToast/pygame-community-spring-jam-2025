@@ -36,9 +36,9 @@ class Level:
           Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "test")
         if col == 'p' :
           self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
-        elif col == 'e':
-          Enemy('stalker', (x, y), [self.visible_sprites],self.obstacle_sprites)
         elif col == 's':
+          Enemy('stalker', (x, y), [self.visible_sprites],self.obstacle_sprites)
+        elif col == 'b':
           Enemy('blind', (x, y), [self.visible_sprites], self.obstacle_sprites)
  
 
