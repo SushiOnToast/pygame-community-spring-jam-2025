@@ -91,14 +91,17 @@ class Level:
         if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy':
             if self.player.hitbox.colliderect(sprite.hitbox):
                 damage = sprite.attack_damage * self.damage_rate * delta_time
-                self.player.health -= damage
-                self.player.health = max(0, self.player.health)
+                if self.player.is_crouching and sprite.monster_name == "blind":
+                   pass
+                else:
+                  self.player.health -= damage
+                  self.player.health = max(0, self.player.health)
 
-                now = pygame.time.get_ticks()
-                if hasattr(sprite, 'attack_sound'):
-                    if now - sprite.last_sound_time > sprite.sound_cooldown:
-                        sprite.attack_sound.play()
-                        sprite.last_sound_time = now
+                  now = pygame.time.get_ticks()
+                  if hasattr(sprite, 'attack_sound'):
+                      if now - sprite.last_sound_time > sprite.sound_cooldown:
+                          sprite.attack_sound.play()
+                          sprite.last_sound_time = now
 
       self.last_damage_time = current_time
 
