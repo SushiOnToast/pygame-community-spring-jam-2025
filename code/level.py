@@ -5,6 +5,7 @@ from player import Player
 from ui import UI
 from enemy import *
 from raycasting import *
+from support import *
 
 
 class Level:
@@ -31,23 +32,24 @@ class Level:
 
   def create_map(self):
     layouts = {
-       
+       "boundary": import_csv_layout("../map/obstacles_obstavles.csv"),
     }
 
-    for row_index, row in enumerate(WORLD_MAP):
-      for col_index, col in enumerate(row):
-        x = col_index * TILESIZE
-        y = row_index * TILESIZE
-        if col == 'x':
-          Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "test")
-        if col == 'p':
-          self.player = Player(
-              (x, y), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
-        elif col == 's':
-          Enemy('stalker', (x, y), [
-                self.visible_sprites], self.obstacle_sprites)
-        elif col == 'b':
-          BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
+    for style, layout in layouts.items():
+      for row_index, row in enumerate(layout):
+        for col_index, col in enumerate(row):
+          if col != -1:
+            x = col_index * TILESIZE
+            y = row_index * TILESIZE
+            Tile((x, y), [self.visible_sprites, self.obstacle_sprites], "invisible")
+          # elif col == 's':
+          #   Enemy('stalker', (x, y), [
+          #         self.visible_sprites], self.obstacle_sprites)
+          # elif col == 'b':
+          #   BlindEnemy((x, y), [self.visible_sprites], self.obstacle_sprites)
+
+    self.player = Player(
+          (360, 360), [self.visible_sprites], self.obstacle_sprites, self.cover_surf)
 
   def get_raycasting_points(self, obstacles):
     obstacle_rects = [obstacle.rect for obstacle in obstacles]
