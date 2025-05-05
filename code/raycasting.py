@@ -74,82 +74,103 @@ def deduplicate_edges(edges):
 
 def merge_edges(edges):
     """
-    Merge colinear and connected edges into longer lines to reduce the number of edges.
-    Only works for horizontal and vertical lines.
+    Optimized edge merging for better performance.
+    Only merges perfectly aligned horizontal and vertical edges.
     """
     from collections import defaultdict
 
-    def snap(p):
-        """Snap a point to the nearest GRID_SIZE multiple to avoid small float mismatches."""
-        return (round(p[0] // TILESIZE) * TILESIZE,
-                round(p[1] // TILESIZE) * TILESIZE)
+    # Snap to grid to avoid float precision issues
+    def snap(coord):
+        return round(coord / TILESIZE) * TILESIZE
 
-    # Separate edges into horizontal and vertical lines, grouped by their y or x coordinate
-    horizontal_lines = defaultdict(list)
-    vertical_lines = defaultdict(list)
+    # Separate horizontal and vertical edges
+    h_edges = defaultdict(list)  # y-coord -> [(x1, x2)]
+    v_edges = defaultdict(list)  # x-coord -> [(y1, y2)]
 
-    for edge in edges:
-        p1, p2 = sorted([snap(edge[0]), snap(edge[1])])
-        if p1[1] == p2[1]:  # horizontal
-            y = p1[1]
-            horizontal_lines[y].append((p1[0], p2[0]))
-        elif p1[0] == p2[0]:  # vertical
-            x = p1[0]
-            vertical_lines[x].append((p1[1], p2[1]))
+    # Sort edges into horizontal and vertical groups
+    for (start, end) in edges:
+        x1, y1 = snap(start[0]), snap(start[1])
+        x2, y2 = snap(end[0]), snap(end[1])
+        
+        if y1 == y2:  # Horizontal edge
+            h_edges[y1].append(sorted([x1, x2]))
+        elif x1 == x2:  # Vertical edge
+            v_edges[x1].append(sorted([y1, y2]))
 
-    def merge_line_segments(segments):
-        """Merge overlapping or touching segments into longer continuous ones."""
+    merged = []
+
+    # Merge horizontal edges
+    for y, segments in h_edges.items():
         if not segments:
-            return []
+            continue
+            
+        # Sort segments by starting x
         segments.sort()
-        merged = []
-        curr_start, curr_end = segments[0]
-        for start, end in segments[1:]:
-            if start <= curr_end:  # Overlapping or touching
-                curr_end = max(curr_end, end)
+        
+        current_start = segments[0][0]
+        current_end = segments[0][1]
+
+        for seg_start, seg_end in segments[1:]:
+            if seg_start <= current_end + TILESIZE:  # Allow 1 tile gap
+                current_end = max(current_end, seg_end)
             else:
-                merged.append((curr_start, curr_end))
-                curr_start, curr_end = start, end
-        merged.append((curr_start, curr_end))
-        return merged
+                merged.append(((current_start, y), (current_end, y)))
+                current_start = seg_start
+                current_end = seg_end
+        
+        merged.append(((current_start, y), (current_end, y)))
 
-    # Reconstruct merged horizontal edges
-    merged_edges = []
+    # Merge vertical edges
+    for x, segments in v_edges.items():
+        if not segments:
+            continue
+            
+        segments.sort()
+        
+        current_start = segments[0][0]
+        current_end = segments[0][1]
 
-    for y, segments in horizontal_lines.items():
-        merged = merge_line_segments(segments)
-        for x1, x2 in merged:
-            merged_edges.append(((x1, y), (x2, y)))
+        for seg_start, seg_end in segments[1:]:
+            if seg_start <= current_end + TILESIZE:  # Allow 1 tile gap
+                current_end = max(current_end, seg_end)
+            else:
+                merged.append(((x, current_start), (x, current_end)))
+                current_start = seg_start
+                current_end = seg_end
+        
+        merged.append(((x, current_start), (x, current_end)))
 
-    # Reconstruct merged vertical edges
-    for x, segments in vertical_lines.items():
-        merged = merge_line_segments(segments)
-        for y1, y2 in merged:
-            merged_edges.append(((x, y1), (x, y2)))
-
-    return merged_edges
+    return merged
 
 
 def get_all_relevant_edges(obstacles):
     """
-    Combines all relevant edges from the obstacle tiles and screen border edges.
-    1. Get non-shared edges from each obstacle tile.
-    2. Add screen border edges for limiting rays.
-    3. Deduplicate and merge final edge list for optimization.
+    Optimized edge collection with caching.
     """
-    all_relevant_edges = []
+    # Cache the results using object IDs as key
+    cache_key = tuple(id(obs) for obs in obstacles)
+    
+    if hasattr(get_all_relevant_edges, 'cache'):
+        if get_all_relevant_edges.cache.get('key') == cache_key:
+            return get_all_relevant_edges.cache['edges']
+    else:
+        get_all_relevant_edges.cache = {}
 
-    # Collect relevant (non-shared) edges from all obstacle tiles
+    all_relevant_edges = []
     for tile in obstacles:
         edges = get_relevant_edges(tile, obstacles)
         all_relevant_edges.extend(edges)
 
-    # Optimize the edge list by removing duplicates and merging
     all_relevant_edges = deduplicate_edges(all_relevant_edges)
     all_relevant_edges = merge_edges(all_relevant_edges)
 
-    return all_relevant_edges
+    # Store in cache
+    get_all_relevant_edges.cache = {
+        'key': cache_key,
+        'edges': all_relevant_edges
+    }
 
+    return all_relevant_edges
 
 class Raycaster:
     @staticmethod

@@ -15,7 +15,7 @@ class Level:
     self.time_survived = 0
     self.start_time = pygame.time.get_ticks()
 
-    self.level_index = 2
+    self.level_index = 3
 
     # sprite group setup
     self.visible_sprites = YSortCameraGroup(self.display_surface, self.level_index)
@@ -34,8 +34,9 @@ class Level:
 
   def create_map(self):
     layouts = {
-        "boundary1": import_csv_layout("../map/obstacles_obstavles.csv"),
-        "boundary2": import_csv_layout("../map/obstacles2_obstacles2.csv"),
+        "boundary1": import_csv_layout("../map/boundary1.csv"),
+        "boundary2": import_csv_layout("../map/boundary2.csv"),
+        "boundary3": import_csv_layout("../map/boundary3.csv"),
     }
 
     for row_index, row in enumerate(layouts[f"boundary{self.level_index}"]):
@@ -71,9 +72,9 @@ class Level:
     self.cover_surf.fill('black')
     self.cover_surf.set_colorkey(COLORKEY)
 
-    # points = self.get_raycasting_points(self.obstacle_sprites)
-    # self.player.echolocation.update(
-    #     self.player.hitbox, self.visible_sprites.offset, points)
+    points = self.get_raycasting_points(self.obstacle_sprites)
+    self.player.echolocation.update(
+        self.player.hitbox, self.visible_sprites.offset, points)
 
     self.cover_surf.set_alpha(OVERLAY_TRANSPARENCY)
 
