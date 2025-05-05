@@ -32,7 +32,7 @@ class Player(Entity):
     self.last_echolocation_pos = None
     self.is_doing_echolocation = False
     self.echolocation_time = 0
-    self.base_echolocation_duration = 3000  # 4 seconds base duration
+    self.base_echolocation_duration = 4000  # 4 seconds base duration
     self.echolocation_duration = self.base_echolocation_duration
     self.is_crouching = False
 
