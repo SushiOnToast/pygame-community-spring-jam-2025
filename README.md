@@ -12,7 +12,7 @@ Are you ready to echo through the void?
 
 ⸻
 
-Controls
+## Controls
 
 ‣ WASD — Move
 
@@ -22,10 +22,10 @@ Controls
 
 ⸻
 
-Setup Instructions
+## Setup Instructions
 
-	1.	Clone this repository
+- Clone this repository
 
-	2.	Install dependencies: pip install pygame
+- Install dependencies: pip install pygame
 
-	3.	Run the game: python main.py (inside the code folder)
+- Run the game: python main.py (inside the code folder)
