@@ -30,6 +30,10 @@ class Level:
     self.last_damage_time = pygame.time.get_ticks()
 
   def create_map(self):
+    layouts = {
+       
+    }
+
     for row_index, row in enumerate(WORLD_MAP):
       for col_index, col in enumerate(row):
         x = col_index * TILESIZE
@@ -147,6 +151,9 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.camera_target = pygame.math.Vector2()
         self.camera_speed = 0.1
 
+        self.floor_surface = pygame.image.load("../graphics/map/map.png").convert()
+        self.floor_rect = self.floor_surface.get_rect(topleft=(0, 0))
+
     def custom_draw(self, player):
       # Update camera target position
       target_x = player.rect.centerx - self.half_width
@@ -158,6 +165,9 @@ class YSortCameraGroup(pygame.sprite.Group):
                         self.offset.x) * self.camera_speed
       self.offset.y += (self.camera_target.y -
                         self.offset.y) * self.camera_speed
+      
+      floor_offset_pos = self.floor_rect.topleft - self.offset
+      self.display_surface.blit(self.floor_surface, floor_offset_pos)
 
       # Draw background sprites first
       for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
